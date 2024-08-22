@@ -11,7 +11,7 @@ I really enjoyed watching Andrej Karpathy's [Neural Networks: Zero to Hero][zero
 By following this Google Collab link that will take you to the notebook with exercises for each chapter of the [building micrograd][mgrad-video] video.
 
 
-## Breif overview of [micrograd][mgrad-gh]
+## Brief overview of [micrograd][mgrad-gh]
 ### What does micrograd do
 It implements backpropagation. Backpropagation is where you step backwards through a __neural network__ and find the gradient at each __neuron__ with respect to the __loss function__.
 
