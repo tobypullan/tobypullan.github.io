@@ -11,7 +11,7 @@ I really enjoyed watching Andrej Karpathy's [Neural Networks: Zero to Hero][zero
 By following this Google Collab link that will take you to the notebook with exercises for each chapter of the [building micrograd][mgrad-video] video.
 
 
-## Overview of [micrograd][mgrad-gh]
+## Breif overview of [micrograd][mgrad-gh]
 ### What does micrograd do
 It implements backpropagation. Backpropagation is where you step backwards through a __neural network__ and find the gradient at each __neuron__ with respect to the __loss function__.
 
@@ -19,7 +19,7 @@ It implements backpropagation. Backpropagation is where you step backwards throu
 In a neural network a neuron is an abstraction of a neuron in the human brain. It takes some inputs, multiplies each of those inputs by a "weight", adds a "bias" and outputs a single value. A neural network is made up of many of these neurons.
 
 ### What is a loss function?
-The loss function outputs a single number that describes how close the output of the neural network is to the actual things that it should be outputing. You are able to differentiate each variable within this function, and all variables within the neural network. This allows you to find out how changing any of the values in the network would effect the loss.
+The loss function outputs a single number that describes how close the output of the neural network is to the actual things that it should be outputing. You are able to differentiate each variable within this function, and all variables within the neural network, with respect to the loss. This allows you to find out how changing any of the values in the network would effect the loss.
 
 [mgrad-video]: https://www.youtube.com/watch?v=VMj-3S1tku0
 [mgrad-gh]: https://github.com/karpathy/micrograd
