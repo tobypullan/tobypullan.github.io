@@ -38,4 +38,7 @@ By minimizing this loss function, we can train the neural network to make better
 
 Link to [Google Colab notebook][Colab-link] for exercises.
 
-[Colab-link]: https://colab.research.google.com/drive/19SoOLoxupP_PlFnobmR36mo6UOHnXfZl?usp=sharing
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/tobypullan/tobypullan.github.io/blob/main/MicrogradPart1Exercises.ipynb)
+
+
+[Colab-link]: https://colab.research.google.com/github/tobypullan/tobypullan.github.io/blob/main/MicrogradPart1Exercises.ipynb
