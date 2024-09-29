@@ -19,7 +19,7 @@ Micrograd is a library that implements backpropagation, a key algorithm in train
   4. Producing a single output value
 - A neural network is composed of many interconnected neurons.
 
-<img src="tobypullan.github.io/assets/images/backprop.png" style="padding-right:10px"/> 
+<img src="/assets/images/backprop.png" style="padding-right:10px"/> 
 
 
 ## What is a loss function?
