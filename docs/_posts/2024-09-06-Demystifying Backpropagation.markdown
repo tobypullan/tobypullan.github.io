@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Demystifying Backpropagation - Not Complete"
+title:  "Demystifying Backpropagation"
 date:   2024-08-21 14:47:26 +0000
 categories: Andrej Karpathy | Neural Networks Zero To Hero
 ---

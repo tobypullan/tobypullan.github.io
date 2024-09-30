@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Introduction To Blog - Not Complete"
-date:   2024-08-21 14:47:26 +0000
+date:   2024-08-20 14:47:26 +0000
 categories: Andrej Karpathy | Neural Networks Zero To Hero
 ---
 
