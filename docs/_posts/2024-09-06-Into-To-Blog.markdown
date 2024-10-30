@@ -5,11 +5,11 @@ date:   2024-08-20 14:47:26 +0000
 categories: Andrej Karpathy | Neural Networks Zero To Hero
 ---
 
-Welcome to my blog series on neural networks, inspired by Andrej Karpathy's ["Neural Networks: Zero to Hero"][zero2hero-series] video series. This blog aims to provide engaging notes and exercises that complement Karpathy's insightful tutorials.
+Welcome to my blog series on neural networks, inspired by Andrej Karpathy's ["Neural Networks: Zero to Hero"][zero2hero-series] video series. This blog aims to provide engaging notes and exercises that complement Karpathy's tutorials.
 
-We'll begin by diving into the [first video][mgrad-video] of the series, which I've broken down into three distinct blog posts for easier digestion:
+My first set of posts will be on the [first video][mgrad-video] of the series. I will split the video into three different blog posts:
 
-1. **Demystifying Backpropagation**: In this post, we'll begin with some notes giving an overview of mircograd and then explore the fundamental concept of backpropagation, the backbone of neural network training.
+1. **On Backpropagation**: In this post, we'll begin with some notes giving an overview of mircograd and then explore the fundamental concept of backpropagation, the backbone of neural network training.
 
 2. **Hands-on Backpropagation**: Here, we'll implement a backpropagation algorithm for a simple neural network, giving you practical experience with this crucial technique.
 

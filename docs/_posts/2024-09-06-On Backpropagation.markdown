@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Demystifying Backpropagation"
+title:  "On Backpropagation"
 date:   2024-08-21 14:47:26 +0000
 categories: Andrej Karpathy | Neural Networks Zero To Hero
 ---
@@ -40,7 +40,7 @@ Backpropagation is a method used to calculate gradients in neural networks. It w
 
 By minimizing this loss function, we can train the neural network to make better predictions.
 
-Link to [Google Colab notebook][Colab-link] for exercises.
+Link to [Google Colab notebook][Colab-link] for some exercises on taking derivatives.
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/tobypullan/tobypullan.github.io/blob/main/MicrogradPart1Exercises.ipynb)
 
