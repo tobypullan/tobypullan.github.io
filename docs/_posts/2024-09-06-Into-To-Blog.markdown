@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Introduction To Blog - Not Complete"
+title:  "Introduction To Blog"
 date:   2024-08-20 14:47:26 +0000
 categories: Andrej Karpathy | Neural Networks Zero To Hero
 ---
@@ -9,13 +9,12 @@ Welcome to my blog series on neural networks, inspired by Andrej Karpathy's ["Ne
 
 My first set of posts will be on the [first video][mgrad-video] of the series. I will split the video into three different blog posts:
 
-1. **On Backpropagation**: In this post, we'll begin with some notes giving an overview of mircograd and then explore the fundamental concept of backpropagation, the backbone of neural network training.
+1. **On Backpropagation (Basics of Differentiation)**: In this post, we'll begin with some notes giving an overview of mircograd and then explore the fundamental concept of backpropagation, the backbone of neural network training.
 
-2. **Hands-on Backpropagation**: Here, we'll implement a backpropagation algorithm for a simple neural network, giving you practical experience with this crucial technique.
+2. **On Backpropagation (Applying to Neural Networks)**: Here, we'll implement a backpropagation algorithm for a simple neural network.
 
-3. **From Micrograd to PyTorch**: In our final installment, we'll demonstrate how to transition from implementing a neural network using Micrograd to leveraging the power of PyTorch, a popular deep learning framework.
+3. **From Micrograd to PyTorch**: Micrograd was designed to have similar syntax to Pytorch. In my final post in this series I will go through how to convert some Micrograd code into Pytorch, and highlight any differences.
 
-Join me on this exciting journey as we unravel the intricacies of neural networks, from foundational concepts to practical implementations!
 
 [mgrad-video]: https://www.youtube.com/watch?v=VMj-3S1tku0
 [mgrad-gh]: https://github.com/karpathy/micrograd

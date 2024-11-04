@@ -4,26 +4,10 @@ title: About
 permalink: /about/
 ---
 
-Welcome to my blog! Here, you'll find a collection of machine learning exercises designed to complement Andrej Karpathy's Neural Networks YouTube series. Whether you're a beginner looking to dive into the world of neural networks or an experienced practitioner seeking to deepen your understanding, these exercises are tailored to provide hands-on experience and practical insights.
+Welcome to my Blog. My name is Toby and I am a first year computer science student at Durham University. I am interested in articial intelligence - specifically neural networks. Because of this, I have started this blog where I will be posting some articles and exercises that I have written about Andrej Karpathy's ["Neural Networks: Zero to Hero"][zero2hero-series] series. 
 
-### What You'll Find Here
+I really enjoyed watching and coding alongside these videos. Before going through these videos, I had very little knowledge of neural networks but I now feel that I have a much better grasp of what is going on behind some of the abstractions involved in a framework like Pytorch. I also enjoyed completing the exercises that Dr Karpathy produced for his videos (that are certainly better than mine) but I wanted to have a go at making my own exercises that could be used as well as all the resources that he has produced.
 
-- **Practical Exercises:** Step-by-step guides and coding examples to help you implement and understand key concepts from the series.
-- **In-Depth Analysis:** Detailed explanations and discussions on various machine learning techniques and algorithms.
-- **Tips and Tricks:** Useful tips to optimize your learning experience and improve your neural network models.
+I hope you find these articles and exercises interesting!
 
-### Why This Blog?
-
-Andrej Karpathy's YouTube series is an invaluable resource for anyone interested in neural networks and machine learning. This blog aims to enhance your learning by providing supplementary materials and exercises that reinforce the concepts discussed in the videos.
-
-### How to Use This Blog
-
-1. **Watch the Videos:** Start by watching Andrej Karpathy's Neural Networks series on YouTube.
-2. **Follow Along:** Use the exercises and examples provided here to practice and solidify your understanding.
-3. **Experiment:** Don't be afraid to tweak the code and explore different parameters to see how they affect your models.
-
-### Stay Connected
-
-Feel free to reach out with any questions, suggestions, or feedback. I'm always looking to improve and expand the content on this blog to better serve the machine learning community.
-
-Happy learning!
+[zero2hero-series]: https://www.youtube.com/playlist?list=PLAqhIrjkxbuWI23v9cThsA9GvCAUhRvKZ
