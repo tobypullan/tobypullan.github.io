@@ -7,6 +7,7 @@ categories: Andrej Karpathy | Neural Networks Zero To Hero
 
 ## Introduction
 This post begins by providing a definition for the value class, along with an explanation of the different attributes and methods that it contains. I then provide explanations for the differential with respect to L for each variable in a larger expression which will help to build an intuitive understanding for backpropagation within an actual neural network.
+
 ## Value Class
 <img src="/assets/images/valueClassDiagram.png" style="padding-right:10px"/> 
 - Add, mul, repr
@@ -75,6 +76,7 @@ y=x^2
 - So can work out local gradients, and then multiply by how E affects L (dL/dE) to get the gradient with respect to L of nodes A and B
 - dE/dA = B.val
 - dE/dB = A.val
+
 ## What have we learnt from doing this?
 Iterated through all the nodes and locally applied the chain rule. We know what the local derivatives at each operation are. Using the chain rule, we can find how each node affects the output and this is backpropagation in action.
 
