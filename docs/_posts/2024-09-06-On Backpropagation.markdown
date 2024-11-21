@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "On Backpropagation"
+title:  "On Backpropagation (Basics of differentiation)"
 date:   2024-08-21 14:47:26 +0000
 categories: Andrej Karpathy | Neural Networks Zero To Hero
 ---
