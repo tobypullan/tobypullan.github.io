@@ -9,7 +9,7 @@ categories: Andrej Karpathy | Neural Networks Zero To Hero
 This post begins by providing a definition for the value class, along with an explanation of the different attributes and methods that it contains. I then provide explanations for the differential with respect to L for each variable in a larger expression which will help to build an intuitive understanding for backpropagation within an actual neural network.
 
 ## Value Class
-<img src="/assets/images/valueClassDiagram.png" style="padding-right:10px"/> 
+<img src="/assets/images/valueClassDiagram.png" style="display: block; margin-left: auto; margin-right: auto; width: 40%;"/> 
 - Add, mul, repr
 - children
 - prev
