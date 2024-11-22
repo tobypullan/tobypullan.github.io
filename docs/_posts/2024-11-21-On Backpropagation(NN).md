@@ -6,10 +6,27 @@ categories: Andrej Karpathy | Neural Networks Zero To Hero
 ---
 
 ## Introduction
-This post begins by providing a definition for the value class, along with an explanation of the different attributes and methods that it contains. I then provide explanations for the differential with respect to L for each variable in a larger expression which will help to build an intuitive understanding for backpropagation within an actual neural network.
+This post begins by providing a definition for the value class, along with an explanation of the different attributes and methods that it contains. I then provide explanations for the differential with respect to L for each variable in a larger expression which will help to build an intuitive understanding for backpropagation within an actual neural network. Finally, we will implement a backward method for the value class, that when called on a value within an expression, will calculate the gradient of each value before with respect to the value that it is called on.
 
 ## Value Class
-<img src="/assets/images/valueClassDiagram.png" style="display: block; margin-left: auto; margin-right: auto; width: 40%;"/> 
+<img src="/assets/images/valueClassDiagram.png" style="display: block; margin-left: auto; margin-right: auto; width: 40%;"/>
+The value class contains methods and attributes that allow you to create expressions. These expressions can be backpropagated through using the backward method. This allows the value of the object to be altered to be changed in a way that has a predictable effect on the overall output of the expression.
+
+### Add
+When two value objects are summed together, Python needs to know how to handle this. This is done using the add method.
+
+```python3
+def __add__(self, other):
+        other = other if isinstance(other, Value) else Value(other)
+        out = Value(self.data + other.data, (self, other), '+')
+
+        def _backward():
+            self.grad += out.grad
+            other.grad += out.grad
+        out._backward = _backward
+
+        return out
+```
 - Add, mul, repr
 - children
 - prev
@@ -93,7 +110,7 @@ https://towardsdatascience.com/the-concept-of-artificial-neurons-perceptrons-in-
 - This sum is then put through an activation function 
 - Usually a squashing function like sigmoid or tanh
 <img src="/assets/images/tanh.png" style="padding-right:10px"/> 
-<img src="/assets/images/sigmoid.png" style="padding-right:10px"/> 
+<img src="/assets/images/sigmoid.png" style="display: block; margin-left: auto; margin-right: auto; width: 40%;"/> 
 
 ### Tanh
 - A hyperbolic function - needs more than just + and *
