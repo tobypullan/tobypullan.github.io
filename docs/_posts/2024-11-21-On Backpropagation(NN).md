@@ -12,22 +12,47 @@ This post begins by providing a definition for the value class, along with an ex
 <img src="/assets/images/valueClassDiagram.png" style="display: block; margin-left: auto; margin-right: auto; width: 40%;"/>
 The value class contains methods and attributes that allow you to create expressions. These expressions can be backpropagated through using the backward method. This allows the value of the object to be altered to be changed in a way that has a predictable effect on the overall output of the expression.
 
-### Add
-When two value objects are summed together, Python needs to know how to handle this. This is done using the add method.
+### \__add__ (and \__mul__ and \__repr__)
+All of these methods are called magic methods. Python contains a lot of magic methods (including \__init__ which is also used in the value class definition) but we will focus on only these three in this section. [This article][https://rszalski.github.io/magicmethods/] by Rafe Kettler on magic methods explains them very well. I used it when writing this section of the article to improve my explanations.
 
-```python3
+When two value objects are summed together, Python needs to know how to handle this. This is done using the \__add__ magic method - it defines behaviour under the + operator.
+
+```python
+# add method within value class
 def __add__(self, other):
+		# checks if other is a constant or a value, if a constant that makes into a value object
         other = other if isinstance(other, Value) else Value(other)
+		# the output of the "+": the data of each value object are summed together.
         out = Value(self.data + other.data, (self, other), '+')
-
+		
+		# ignore this for now: (used for calculating the gradient automatically during backpropagation)
+		# -------------------------
         def _backward():
             self.grad += out.grad
             other.grad += out.grad
         out._backward = _backward
-
+		# -------------------------
         return out
+
+# define two value objects
+a = Value(2.0,label='a')
+b = Value(3.0,label='b')
+
+# writing this
+c = a + b
+# is equivalent to writing this
+c = a.__add__(b)
 ```
-- Add, mul, repr
+When two value objects are multiplied a similar process happens compared to when two value objects are summed together. The only difference is now the output is the data of the objects multiplied together instead of added, and the backward function looks a bit different.
+
+\__repr__ defines the behavior of the value class when it is output in the notebook. \__repr__ outputs the value of the object and the gradient with respect to the output as a string, rather than a memory location.
+```python
+def __repr__(self):
+    return f"Value(data={self.data}, grad={self.grad})"
+```
+There are more magic methods in the value class but they follow the same principles that I have described above.
+
+- Add, mul, repr #DONE
 - children
 - prev
 - each operation adds to set of children (adds values that produced it)
