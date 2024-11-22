@@ -72,7 +72,7 @@ There are more magic methods in the value class but they follow the same princip
 - draw_dot displays these nodes and edges, adds nodes where ops are for clarity
 
 ## Backprop by hand through Andrej's Graph
-Karpathy uses a graphical visualisation of expressions (shown in the image below) to improve intuition around finding derivatives at each node with respect to the output. The expression used in his video is shown below, along with the graph.
+Karpathy uses a graphical visualisation of expressions (shown in the image below) to improve intuition around finding derivatives at each node with respect to the output. The expression used in his video is shown below, along with the graph that shows how nodes are combined with operations towards the output.
 ```python 
 e = a * b
 d = e + c
@@ -81,19 +81,34 @@ L = d * f
 <img src="/assets/images/expressionGraph.png" style="padding-right:10px"/> 
 
 ### dL/dL
-- How much does L change if I change L by h?
-- Changes by h
-- dL/dL - The rate of change of L with respect to L is constant so = 1
-- Example:
-y=x^2
-|---|---|
-|x  |  y|
-|  1|  1|
-|  2|  4|
-|  3|  9|
-|  4| 16|
-|  5| 25|
-	- Plot x against x
+The first node to find the derivative of is L. We are trying to find how all the nodes effect L, so we are finding dL/dL. This is like saying how much does L change if I change L by h (think back to differentiation by first principles)? Funnily enough, L changes by h if you change L by h.
+
+So, the rate of change of L with respect to L is constant, dL/dL = 1.
+
+If you're not convinced, take an expression, say y=x^2. Now, plot x against x. You can see that it is a straight line with gradient 1, hence the derivative of x with respect to itself is 1. This graph is shown below:
+<table style="display: block; margin-left: auto; margin-right: auto; width: 40%;">
+<tr>
+    <th>x</th>
+    <th>y</th>
+</tr>
+<tr>
+    <td>1</td>
+    <td>1</td>
+</tr>
+<tr>
+    <td>2</td>
+    <td>4</td>
+</tr>
+<tr>
+    <td>3</td>
+    <td>9</td>
+</tr>
+<tr>
+    <td>4</td>
+    <td>16</td>
+</tr>
+</table>
+
 <img src="/assets/images/xAgainstX.png" style="padding-right:10px"/> 
 	- dx/dx is 1
 
