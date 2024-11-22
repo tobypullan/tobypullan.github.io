@@ -4,6 +4,8 @@ title:  "On Backpropagation (Applications to Neural Networks)"
 date:   2024-11-21 15:41:26 +0000
 categories: Andrej Karpathy | Neural Networks Zero To Hero
 ---
+## TODO
+- _backward explanation
 
 ## Introduction
 This post begins by providing a definition for the value class, along with an explanation of the different attributes and methods that it contains. I then provide explanations for the differential with respect to L for each variable in a larger expression which will help to build an intuitive understanding for backpropagation within an actual neural network. Finally, we will implement a backward method for the value class, that when called on a value within an expression, will calculate the gradient of each value before with respect to the value that it is called on.
@@ -12,8 +14,21 @@ This post begins by providing a definition for the value class, along with an ex
 <img src="/assets/images/valueClassDiagram.png" style="display: block; margin-left: auto; margin-right: auto; width: 40%;"/>
 The value class contains methods and attributes that allow you to create expressions. These expressions can be backpropagated through using the backward method. This allows the value of the object to be altered to be changed in a way that has a predictable effect on the overall output of the expression.
 
+### \__init__
+What is going on when the value class is initialised?
+```python
+def __init__(self, data, _children=(), _op='', label=''):
+	self.data = data
+    self.grad = 0.0
+    self._backward = lambda: None
+    self._prev = set(_children)
+    self._op = _op
+    self.label = label
+```
+Clearly, self.data is set to data and self.label is set to label (both parameters passed in when the object is initialised). "label" is what is displayed for the value object when it is within the graphical representation of the expression. self.grad is initialised at zero as this means that changing the value of the object will have no effect on the output of the expression, which initially is the behaviour that we want. self._backward is defined as a function that by default returns None. We will revisit _backward and backward later in this article. self._prev contains the nodes that were used to generate the current node, and self._op stores the operation that was used on those previous nodes to generate the current node.
+
 ### \__add__ (and \__mul__ and \__repr__)
-All of these methods are called magic methods. Python contains a lot of magic methods (including \__init__ which is also used in the value class definition) but we will focus on only these three in this section. [This article][https://rszalski.github.io/magicmethods/] by Rafe Kettler on magic methods explains them very well. I used it when writing this section of the article to improve my explanations.
+All of these methods are called magic methods. Python contains a lot of magic methods (including \__init__ which you saw above) but we will focus on only these three in this section. [This article][MagicMethodsArticle] by Rafe Kettler on magic methods explains them very well. I used it when writing this section of the article to improve my explanations.
 
 When two value objects are summed together, Python needs to know how to handle this. This is done using the \__add__ magic method - it defines behaviour under the + operator.
 
@@ -45,28 +60,24 @@ c = a.__add__(b)
 ```
 When two value objects are multiplied a similar process happens compared to when two value objects are summed together. The only difference is now the output is the data of the objects multiplied together instead of added, and the backward function looks a bit different.
 
-\__repr__ defines the behavior of the value class when it is output in the notebook. \__repr__ outputs the value of the object and the gradient with respect to the output as a string, rather than a memory location.
+\__repr__ defines the behavior of the value class when it is output in the notebook. \__repr__ outputs the value of the object and the gradient with respect to the output as a string, rather than a memory location (which is much less helpful).
 ```python
 def __repr__(self):
     return f"Value(data={self.data}, grad={self.grad})"
 ```
 There are more magic methods in the value class but they follow the same principles that I have described above.
 
-- Add, mul, repr #DONE
-- children
-- prev
-- each operation adds to set of children (adds values that produced it)
-- op, stores operation that produced value
-- label, for displaying value objects on graph representation of expression
-- self.grad initially set to 0 so weight doesn't change
-- (later self.backward - a function that !!!!!!!!!!!!!!!!!!!!! )
-# Graph viz for expressions
+## Graph viz for expressions
 - trace builds set of all nodes and edges
 - draw_dot displays these nodes and edges, adds nodes where ops are for clarity
-# Backprop by hand through Andrej's Graph
+
+## Backprop by hand through Andrej's Graph
+Karpathy uses a graphical visualisation of expressions (shown in the image below) to improve intuition around finding derivatives at each node with respect to the output. The expression used in his video is shown below, along with the graph.
+```python 
 e = a * b
 d = e + c
 L = d * f
+```
 <img src="/assets/images/expressionGraph.png" style="padding-right:10px"/> 
 
 ### dL/dL
@@ -214,3 +225,6 @@ https://towardsdatascience.com/the-concept-of-artificial-neurons-perceptrons-in-
 - So really implementing a power function
 - Local derivative: other * self.data ** other - 1
 - self.grad = local derivative * out.grad
+
+
+[MagicMethodsArticle]: https://rszalski.github.io/magicmethods/
