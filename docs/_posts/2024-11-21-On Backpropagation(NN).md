@@ -86,7 +86,7 @@ The first node to find the derivative of is L. We are trying to find how all the
 So, the rate of change of L with respect to L is constant, dL/dL = 1.
 
 If you're not convinced, take an expression, say y=x^2. Now, plot x against x. You can see that it is a straight line with gradient 1, hence the derivative of x with respect to itself is 1. This graph is shown below:
-<table style="display: block; margin-left: auto; margin-right: auto; width: 40%;">
+<table>
 <tr>
     <th>x</th>
     <th>y</th>
@@ -107,50 +107,36 @@ If you're not convinced, take an expression, say y=x^2. Now, plot x against x. Y
     <td>4</td>
     <td>16</td>
 </tr>
+<tr>
+    <td>5</td>
+    <td>25</td>
+</tr>
 </table>
 
 <img src="/assets/images/xAgainstX.png" style="padding-right:10px"/> 
 	- dx/dx is 1
 
-### dL/dD
-- Derivative of L with respect to D
-- How does L change when bump d by h
-- L = D * F so dL/dD = F
-- dL/dF = D
-- f.grad = d.val
-- d.grad = f.val
+### dL/dD and dL/dF
+Next we need to find the derivative of D with respect to L. This is like saying "How does L change when we bump D by h". Looking back at our expression, we can see that L = D * F so dL/dD is F. Similarly, dL/dF = D. So, F.grad = D.data and D.grad = F.data. Neat!
 
 ### MOST IMPORTANT NODE TO UNDERSTAND (Using the chain rule)
-- dL/dC = ?
-- We know how L is sensitive to D
-- C goes through D to L
-- So if we know impact of C on D and D on L, we know how C relates to D
-- D = C + E
-- dD/dC = 1
-- dL/dD = F.val
-- By chain rule dL/dC = F.val
-- Wikipedia has a nice intuitive explanation
-- dL/dE = ?
-- Also = F.val as affects D the same amount that C affects D (dD/dC=dD/dE) 
-- + operation distributes the gradient to the previous two nodes
+This is where things start to get a bit more interesting. We now want to find the derivative of C with respect to L: dL/dC. We know D = C + E and L = D * F so we know how D will change if we change C by a bit and we know how L will change if we change D. 
+This is the intuition behind the chain rule. The Wikipedia article on the [chain rule][ChainRuleArticle] has a nice explanation on this: "If a car travels twice as fast as a bicycle and the bicycle is four times as fast as a walking man, then the car travels 2 * 4 = 8 times as fast as the man."
+So lets begin by working out the impact of C on D, which is another way of saying what is dD/dC. dD.dC = 1.
+Next we need to work out the impact of D on L - dL/dD = F. Using the chain rule, we know that dL/dC = dD/dC * dL/dD = 1 * F = F
+Similarly, dL/dE = dD/dE * dL/dD = 1 * F = dL/dD.
+Looking back at the expression in graph form, we see that the two nodes combined under the + operation now have the same gradient:
+<img src="/assets/images/expressionPlusDemo.png">
+
 
 ### Another application of the chain rule
-- dL/dA = ?
-- dL/dB
-- Chain rule says = (dL / dE) * (local gradient)
-- local gradient = dE/dA
-- Imagine you're the * node
-- Only know that you did A * B = E
-- So can work out local gradients, and then multiply by how E affects L (dL/dE) to get the gradient with respect to L of nodes A and B
-- dE/dA = B.val
-- dE/dB = A.val
+The next gradients we want to find is A and B, both with respect to L: dL/dA and dL/dB. The "local" expression is e = a * b. As we saw at the plus node, if we know how A affects E, and how E affects D etc, we can work out how A affects L. We have already worked out how E affects L so to find how a affects L, we need to find dE/dA and multiply that by dL/dE. We can call dE/dA the local gradient so to find the gradient at a node with respect to the output of the expression, we do the local gradient * the gradient of the output of the local expression with respect to the output. So dL/dA = dE/dA * dL/dE and dL/dB = dE/dB * dL/dE. dL/dA =  B * F, dL/dB = A * F.
 
 ## What have we learnt from doing this?
 Iterated through all the nodes and locally applied the chain rule. We know what the local derivatives at each operation are. Using the chain rule, we can find how each node affects the output and this is backpropagation in action.
 
 ## Optimisation
-- Nudge value in direction of the gradient to get an increase in L
-- Easy!
+Now that we have the gradient at each node, we know how changing the value of the node to be more positive or more negative will effect the overall output of the expression (if the gradient is positive, increasing the value will increase the output of the expression). The output of a neural network comes from a loss function. This function takes the output of the neural network and compares it with the actual output that it should have produced. The goal is to minimise the loss function to make the outputs of the network as close to the actual output it should have produced as possible. Using the gradients at each node, the "weights" in the neural network can be changed so that the loss function is minimised. This is how neural networks are optimised.
 
 ## Backpropagation through a neuron
 <img src="/assets/images/neurons.png" style="padding-right:10px"/> 
@@ -243,3 +229,4 @@ https://towardsdatascience.com/the-concept-of-artificial-neurons-perceptrons-in-
 
 
 [MagicMethodsArticle]: https://rszalski.github.io/magicmethods/
+[ChainRuleArticle]: https://en.wikipedia.org/wiki/Chain_rule
