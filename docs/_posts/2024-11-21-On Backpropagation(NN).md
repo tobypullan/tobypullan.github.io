@@ -114,7 +114,6 @@ If you're not convinced, take an expression, say y=x^2. Now, plot x against x. Y
 </table>
 
 <img src="/assets/images/xAgainstX.png" style="padding-right:10px"/> 
-	- dx/dx is 1
 
 ### dL/dD and dL/dF
 Next we need to find the derivative of D with respect to L. This is like saying "How does L change when we bump D by h". Looking back at our expression, we can see that L = D * F so dL/dD is F. Similarly, dL/dF = D. So, F.grad = D.data and D.grad = F.data. Neat!
@@ -129,7 +128,7 @@ Looking back at the expression in graph form, we see that the two nodes combined
 <img src="/assets/images/expressionPlusDemo.png">
 
 
-### Another application of the chain rule
+### Applying the chaian rule again
 The next gradients we want to find is A and B, both with respect to L: dL/dA and dL/dB. The "local" expression is e = a * b. As we saw at the plus node, if we know how A affects E, and how E affects D etc, we can work out how A affects L. We have already worked out how E affects L so to find how a affects L, we need to find dE/dA and multiply that by dL/dE. We can call dE/dA the local gradient so to find the gradient at a node with respect to the output of the expression, we do the local gradient * the gradient of the output of the local expression with respect to the output. So dL/dA = dE/dA * dL/dE and dL/dB = dE/dB * dL/dE. dL/dA =  B * F, dL/dB = A * F.
 
 ## What have we learnt from doing this?
@@ -139,14 +138,13 @@ Iterated through all the nodes and locally applied the chain rule. We know what 
 Now that we have the gradient at each node, we know how changing the value of the node to be more positive or more negative will effect the overall output of the expression (if the gradient is positive, increasing the value will increase the output of the expression). The output of a neural network comes from a loss function. This function takes the output of the neural network and compares it with the actual output that it should have produced. The goal is to minimise the loss function to make the outputs of the network as close to the actual output it should have produced as possible. Using the gradients at each node, the "weights" in the neural network can be changed so that the loss function is minimised. This is how neural networks are optimised.
 
 ## Backpropagation through a neuron
-<img src="/assets/images/neurons.png" style="padding-right:10px"/> 
+<img src="/assets/images/neurons.png" style="padding-right:10px"/>
 https://towardsdatascience.com/the-concept-of-artificial-neurons-perceptrons-in-neural-networks-fab22249cbfc
-- A neural network is made up of neurons
-- Neurons (in a neural network) multiply their inputs by weights stored in the neurons
-- They sum the products of the inputs and weights and add a bias to that sum
-- This sum is then put through an activation function 
-- Usually a squashing function like sigmoid or tanh
-<img src="/assets/images/tanh.png" style="padding-right:10px"/> 
+A neural network is made up of neurons. A neuron is an abstraction for a function. The function takes in some inputs. Each input is multiplied by a different weight stored in the neuron. The outputs of these multiplications are then summed together with a bias. The output of this sum is then put through an activiation function like tanh or sigmoid which squashes its value between 1 and -1 (different activation functions can be used, but we will be using tanh). You can see this in the image above.
+
+This is the tanh function. Notice how the higher the magnitude the input to the function is, the closer to one the output is. However, there are diminishing returns - closer to zero an increase in the input will increase the output more than if you are further from zero and increase the input.
+<img src="/assets/images/tanh.png" style="padding-right:10px"/>
+This is the sigmoid function. It is similar to tanh, except it is bounded between 0 and 1 rather than between -1 and 1.
 <img src="/assets/images/sigmoid.png" style="display: block; margin-left: auto; margin-right: auto; width: 40%;"/> 
 
 ### Tanh
