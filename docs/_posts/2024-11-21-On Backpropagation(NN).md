@@ -4,8 +4,6 @@ title:  "On Backpropagation (Applications to Neural Networks)"
 date:   2024-11-21 15:41:26 +0000
 categories: Andrej Karpathy | Neural Networks Zero To Hero
 ---
-## TODO
-- _backward explanation
 
 ## Introduction
 This post begins by providing a definition for the value class, along with an explanation of the different attributes and methods that it contains. I then provide explanations for the differential with respect to L for each variable in a larger expression which will help to build an intuitive understanding for backpropagation within an actual neural network. Finally, we will implement a backward method for the value class, that when called on a value within an expression, will calculate the gradient of each value before with respect to the value that it is called on.
@@ -139,7 +137,7 @@ Now that we have the gradient at each node, we know how changing the value of th
 
 ## Backpropagation through a neuron
 <img src="/assets/images/neurons.png" style="padding-right:10px"/>
-https://towardsdatascience.com/the-concept-of-artificial-neurons-perceptrons-in-neural-networks-fab22249cbfc
+["towards data science neurons in perceptrons"][towardsDSNeurons]
 A neural network is made up of neurons. A neuron is an abstraction for a function. The function takes in some inputs. Each input is multiplied by a different weight stored in the neuron. The outputs of these multiplications are then summed together with a bias. The output of this sum is then put through an activiation function like tanh or sigmoid which squashes its value between 1 and -1 (different activation functions can be used, but we will be using tanh). You can see this in the image above.
 
 This is the tanh function. Notice how the higher the magnitude the input to the function is, the closer to one the output is. However, there are diminishing returns - closer to zero an increase in the input will increase the output more than if you are further from zero and increase the input.
@@ -148,13 +146,18 @@ This is the sigmoid function. It is similar to tanh, except it is bounded betwee
 <img src="/assets/images/sigmoid.png" style="display: block; margin-left: auto; margin-right: auto; width: 40%;"/> 
 
 ### Tanh
-- A hyperbolic function - needs more than just + and *
-- Need exponentiation and division
-- Could break down the tanh function into exponentiations and divisions
-- But don't need to do that - only need to get the output of the tanh and the local derivative so that chain rule can be applied
-- Local derivative of tanh(x) = 1-tanh(x)^2
+Tanh(x) = (e^2x - 1)/(e^2x + 1). Currently, the value object can only handle addition, multiplication and subtraction. If we were to break down the tanh function into individual operations and backpropagate through it that way, we would have to implement exponentiation and division methods within the class. To avoid doing this, we can use the math.tanh function built into Python. 
+The local derivative of tanh(x) is 1-tanh(x)^2 so we can implement the backward function in the value class like this:
+```python
+def _backward():
+      self.grad += (1 - t**2) * out.grad
+    out._backward = _backward
+```
 
 ### Backpropagation through neuron
+We now have enough knowledge to backpropagate through an actual neuron within a neural network. Look back at the image of the neuron to remind yourself of the expression that we will be going back through. Before we begin, it should be noted that we don't need to work out the gradients at the inputs (x1, x2, ...) as these are not parameters of the network. We can only change the weights to effect the output of the network so we need to find the derivative of the weights with respect to the output of the neuron.
+
+
 - Finding the derivative of the weights with respect to output
 - In a neural net, finding derivative with respect to output of the whole network through the loss function
 - O = tanh(n)
@@ -228,3 +231,4 @@ This is the sigmoid function. It is similar to tanh, except it is bounded betwee
 
 [MagicMethodsArticle]: https://rszalski.github.io/magicmethods/
 [ChainRuleArticle]: https://en.wikipedia.org/wiki/Chain_rule
+[towardsDSNeurons]: https://towardsdatascience.com/the-concept-of-artificial-neurons-perceptrons-in-neural-networks-fab22249cbfc
