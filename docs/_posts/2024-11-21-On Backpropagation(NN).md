@@ -3,6 +3,7 @@ layout: post
 title:  "On Backpropagation (Applications to Neural Networks)"
 date:   2024-11-21 15:41:26 +0000
 categories: Andrej Karpathy | Neural Networks Zero To Hero
+usemathjax: true
 ---
 
 ## Introduction
@@ -157,7 +158,7 @@ def _backward():
 
 ### Backpropagation through neuron
 
-<img src="assets/images/neuronExpressionGraph.png">
+<img src="/assets/images/expressionGraph.png">
 
 We now have enough knowledge to backpropagate through an actual neuron within a neural network. Look back at the image of the neuron to remind yourself of the expression that we will be going back through. Before we begin, it should be noted that we don't need to work out the gradients at the inputs (x1, x2, ...) as these are not parameters of the network. We can only change the weights to effect the output of the network so we need to find the derivative of the weights with respect to the output of the neuron.
 
