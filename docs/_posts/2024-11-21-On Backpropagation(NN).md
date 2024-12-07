@@ -137,7 +137,8 @@ Now that we have the gradient at each node, we know how changing the value of th
 
 ## Backpropagation through a neuron
 <img src="/assets/images/neurons.png" style="padding-right:10px"/>
-["towards data science neurons in perceptrons"][towardsDSNeurons]
+Image from ["towards data science neurons in perceptrons"][towardsDSNeurons]
+
 A neural network is made up of neurons. A neuron is an abstraction for a function. The function takes in some inputs. Each input is multiplied by a different weight stored in the neuron. The outputs of these multiplications are then summed together with a bias. The output of this sum is then put through an activiation function like tanh or sigmoid which squashes its value between 1 and -1 (different activation functions can be used, but we will be using tanh). You can see this in the image above.
 
 This is the tanh function. Notice how the higher the magnitude the input to the function is, the closer to one the output is. However, there are diminishing returns - closer to zero an increase in the input will increase the output more than if you are further from zero and increase the input.
@@ -155,48 +156,73 @@ def _backward():
 ```
 
 ### Backpropagation through neuron
+
+<img src="assets/images/neuronExpressionGraph.png">
+
 We now have enough knowledge to backpropagate through an actual neuron within a neural network. Look back at the image of the neuron to remind yourself of the expression that we will be going back through. Before we begin, it should be noted that we don't need to work out the gradients at the inputs (x1, x2, ...) as these are not parameters of the network. We can only change the weights to effect the output of the network so we need to find the derivative of the weights with respect to the output of the neuron.
 
+When backpropagating, we start with the last part of the expression graph, and in the case of a neuron, that is the tanh: O = tanh(n) where O is the output and n is the input to the tanh from the previous part of the expression graph. dO/dN = 1 - O.data^2 
 
-- Finding the derivative of the weights with respect to output
-- In a neural net, finding derivative with respect to output of the whole network through the loss function
-- O = tanh(n)
-- dO/dN = 1-o.data^2
-- Next is a plus node, a plus distributes the gradient - look back at previous explanation
-- dO/x2w2 = dO/dx1w1 = 0.5 (see diagram)
-- x2 * w2 = x2w2
-- d(x2w2)/dx2 = w2 (local derivative)
-- dO/dx2w2 = 0.5 (from before)
-- so dO/dx2 = d(x2w2)/dx2 * dO/dx2w2 = 0.5 * w2
-- Chain rule again, I find it helpful to think about the intuitive explanation Wikipedia provides
-- dO/dw2 = 0 as initially x2 set to 0 so changing w2 doesn't have any effect on the output as it is being multiplied by 0 
-- Repeat for x1 and w1
+$$
+\frac{\mathrm{d}o}{\mathrm{d}n} = 1 - O.data^2
+$$
+
+Next is the plus node which distributes the gradient of the result of the operation to the nodes previous to it, as we saw in our first expression example.
+
+$$
+\frac{\mathrm{d}O}{\mathrm{d}x2w2} = \frac{\mathrm{d}O}{\mathrm{d}x1w1} = 0.5
+$$
+
+Each of the inputs (in this case x1 and x2) are multiplied by weights (in this case w1 and w2) in the neuron. Using the chain rule, we can find the derivative of the weights with respect to the output:
+
+$$
+x2w2 = x2 * w2
+\frac{\mathrm{d}x2w2}{\mathrm{d}x2} = w2 (local derivative)
+\frac{\mathrm{d}O}{\mathrm{d}x2w2} = 0.5
+\frac{\mathrm{d}O}{\mathrm{d}x2} = \frac{\mathrm{d}O}{\mathrm{d}x2w2} * \frac{\mathrm{d}x2w2}{\mathrm{d}x2} = 0.5 * w2
+$$
+And this is the derivative of w2 with respect to the output of the neuron! Repeat for the other weights and we now know how changing any of the weights will change the output of the neuron.
+
+If this was challenging, I recommend going back through the first expression graph and recalculating the derivatives, and to look at the intuitive explanation on the Wikipedia page for the [chain rule][ChainRuleArticle]
 
 ## Implementing the backward pass automatically!
+In this section of this post, we will be adding functions to the operation methods within the value class. Eventually, this will allow .backward to be called on any node in the expression and the derivative of all previous nodes with respect to that node will be calculated.
+
 ### Add
-- out.backward is the function that propagates the gradient
-- need to put gradient into self.grad and other.grad - think about in graph, other and self point into add node
-- need to find local derivative, so with respect to the output
-- self.grad = out.grad
-- other.grad = out.grad
+The add method takes two value objects - self and other. The backward method should set self.grad and other.grad. We know that the plus node distributes the gradient of the output of the node to its previous nodes, so:
+
+$$
+self.grad = out.grad
+other.grad = out.grad
+$$
+
 
 ### Mul
-- let other = A
-- let self = B
-- let out = O
-- O = A * B
-- local gradient (for A): dO/dA = B
-- so A.grad = B.val * out.grad
-- Repeat for B
-- (Using letters made it easier for me to think through it)
+The backward function for mul is a slightly more involved than for the add method. We need to find the local gradient and multiply it by the gradient of the output:
+
+$$
+other = A
+self = B
+out = O
+O = A * B
+\frac{\mathrm{d}O}{\mathrm{d}A} = B (local gradient for A)
+A.grad = B.val * out.grad
+$$
+(I found it easier to think about using A, B and O as variable names)
+
 
 ### Tanh
-- We have out.grad, need to chain it into self.grad
-- LOut = tanh(self.val)
-- dLOut/dSelf = 1-tanh(self.val)^2 = local derivative
-- so dO/dSelf = (1-tanh(self.val)^2) * out.grad
+We have out.grad and we need to chain it into self.grad - this time we don't have an other.grad as tanh only takes one input.
+
+$$
+out = tanh(self.val)
+\frac{\mathrm{d}out}{\mathrm{d}self} = 1 - tanh(self.val)^2 (local gradient)
+self.grad = 1 - tanh(self.val)^2 * out.grad
+$$
 
 ### Doing the pass
+
+
 - Remember to initially set the output gradient to 1 (dO/dO = 1)
 - Can call node.backward at each value to get the gradient with respect to output
 - Never call .backward on a node, until all nodes after it have had .backward called on them
