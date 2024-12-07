@@ -158,7 +158,7 @@ def _backward():
 
 ### Backpropagation through neuron
 
-<img src="/assets/images/expressionGraph.png">
+<img src="/assets/images/neuronExpressionGraph.png">
 
 We now have enough knowledge to backpropagate through an actual neuron within a neural network. Look back at the image of the neuron to remind yourself of the expression that we will be going back through. Before we begin, it should be noted that we don't need to work out the gradients at the inputs (x1, x2, ...) as these are not parameters of the network. We can only change the weights to effect the output of the network so we need to find the derivative of the weights with respect to the output of the neuron.
 
