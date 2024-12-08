@@ -5,7 +5,9 @@ date:   2024-11-21 15:41:26 +0000
 categories: Andrej Karpathy | Neural Networks Zero To Hero
 usemathjax: true
 ---
-
+<script type="text/javascript" async
+    src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
 ## Introduction
 This post begins by providing a definition for the value class, along with an explanation of the different attributes and methods that it contains. I then provide explanations for the differential with respect to L for each variable in a larger expression which will help to build an intuitive understanding for backpropagation within an actual neural network. Finally, we will implement a backward method for the value class, that when called on a value within an expression, will calculate the gradient of each value before with respect to the value that it is called on.
 
@@ -222,15 +224,32 @@ self.grad = 1 - tanh(self.val)^2 * out.grad
 $$
 
 ### Doing the pass
+Now that we have implemented backward function for all the operation methods, we can implement a backward method for the value class. First we need to set self.grad to 1 as we know dx/dx = 1.
 
+We can only call .backward on a node, until all the nodes after it have had .backward called on them. This means we need to sort the nodes in the expression graph to ensure that we don't call the backward function on a node who's output does not have a .grad.
+This can be achieved using a [topological sort][topoSort]. This ensures that "for every directed edge (u,v) from vertex u to vertex v, u comes before v in the ordering" (if .backawrd is called on nodes in this order then there is not a case where .backward will be called on a node who's output has no .grad).
 
-- Remember to initially set the output gradient to 1 (dO/dO = 1)
-- Can call node.backward at each value to get the gradient with respect to output
-- Never call .backward on a node, until all nodes after it have had .backward called on them
-- This can be achieved using topological sort - all edges go in only one direction
-- Put this sort with value so that .backward (without underscore) can be called on a node and all the nodes before it will have gradient propagated through
+```python
+# method of value class
+def backward(self):   
+    topo = []
+    visited = set()
+    def build_topo(v):
+      if v not in visited:
+        visited.add(v)
+        for child in v._prev:
+          build_topo(child)
+        topo.append(v)
+    build_topo(self)
+    
+    self.grad = 1.0
+    for node in reversed(topo):
+      node._backward()
+```
 
 ### A bug!
+There is currently a bug in our implementation. If we have the expression b = a + a, we get a gradient of 1 not 2. This is because self.grad is set to 1 and other.grad is set to 1 but other and self are the same object in this case, so other.grad overrides self.grad. They should accumulate not override. This bug appears when we use a variable more than once in an expression.
+When we are backpropagating through the expression graph, we are actually doing partial derivatives *** CHECK ***
 - What if b = a + a and call b.backward
 - Get a gradient of 1 not 2
 - This is because self.grad was set to 1 and then other.grad was set to 1 - other overrides self, they should accumulate not override
@@ -238,6 +257,8 @@ $$
 
 ## Breaking down tanh (a fun exercise!)
 ### Adding constant functionality
+In order to implement tanh
+
 - Cannot add a constant to a value object at the moment
 - Python trying to access constant.data but that does not exist (eg 1.data)
 - Fix this by checking whether other is an instance of a value, and if it isn't wrap the constant into a value object
@@ -259,3 +280,4 @@ $$
 [MagicMethodsArticle]: https://rszalski.github.io/magicmethods/
 [ChainRuleArticle]: https://en.wikipedia.org/wiki/Chain_rule
 [towardsDSNeurons]: https://towardsdatascience.com/the-concept-of-artificial-neurons-perceptrons-in-neural-networks-fab22249cbfc
+[topoSort]: https://en.wikipedia.org/wiki/Topological_sorting
