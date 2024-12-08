@@ -219,7 +219,9 @@ We have out.grad and we need to chain it into self.grad - this time we don't hav
 
 $$
 out = tanh(self.val)
+
 \frac{\mathrm{d}out}{\mathrm{d}self} = 1 - tanh(self.val)^2 (local gradient)
+
 self.grad = 1 - tanh(self.val)^2 * out.grad
 $$
 
@@ -256,25 +258,25 @@ When we are backpropagating through the expression graph, we are actually doing 
 - We get the bug when using a variable more than once
 
 ## Breaking down tanh (a fun exercise!)
-### Adding constant functionality
-In order to implement tanh
 
-- Cannot add a constant to a value object at the moment
-- Python trying to access constant.data but that does not exist (eg 1.data)
-- Fix this by checking whether other is an instance of a value, and if it isn't wrap the constant into a value object
-- This doesn't work when constant * value object
-- Use rmul to switch order of operands (rmul is called if mul doesn't work)
+$$
+\tanh(x) = \frac{e^2x - 1}{e^2x + 1}
+$$
+
+### Adding constant functionality
+In order to implement tanh with its individual components, we need to apply operations with constants to value objects. At the moment we can only apply operations to two value objects. When a value object is added to a constant, Python is trying to access constant.data
+but that does not exist. To fix this, we can check whether other isinstance of a value, and if it isn't, wrap the constant into a value object. This fix works, but only when the constant is applied to the value object, not when the value object is applied to the
+constant. To fix this, we can define radd, rmul, etc methods within the value class. These methods are so that if constant.\__add__(valueobject) is called, the interpreter knows how to handle the reversed order compared to the \__add__ method.
 
 ### Exponentials
-- output is math.exp(self.data)
-- local derivative: e^x stays as e^x 
-- self.grad = out.data * out.grad
+Next we need to add exponentials to our value class. We can use math.exp(self.data) for the output of the object. The local derivative stays as e^x as d(e^x)/dx = e^x so self.grad = out.data * out.grad.
 
 ### Division
-- Division is a special case of multiplication with the divisor (in the multiplication) raised to the power of -1
-- So really implementing a power function
-- Local derivative: other * self.data ** other - 1
-- self.grad = local derivative * out.grad
+Finally, division is just a special case of multiplication where the divisor (in the multiplication) has been raised to the power of -1. This means for our implementation of division, we will really just be implementing a power function. For the output we can use
+self.data**other (not other.data as we are only handling to the power of a constant not a value object). The local derivative is other * self.data ** (other - 1) so self.grad = other * self.data ** (other - 1) * out.grad.
+
+## Summary
+In this blog post, we have gone through Micrograd's implementation of the value class, with a focus on how the backward method works. We have used our knowledge of the chain rule to backpropagate by hand first through an example expression and through a neuron that would be used as part of a wider neural network.
 
 
 [MagicMethodsArticle]: https://rszalski.github.io/magicmethods/
