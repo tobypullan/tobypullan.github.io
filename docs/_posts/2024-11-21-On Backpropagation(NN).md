@@ -41,13 +41,13 @@ def __add__(self, other):
 		# the output of the "+": the data of each value object are summed together.
         out = Value(self.data + other.data, (self, other), '+')
 		
-		# ignore this for now: (used for calculating the gradient automatically during backpropagation)
-		# -------------------------
+# ignore this for now: (used for calculating the gradient automatically during backpropagation)
+# ------------------------------
         def _backward():
             self.grad += out.grad
             other.grad += out.grad
         out._backward = _backward
-		# -------------------------
+# ------------------------------
         return out
 
 # define two value objects
@@ -67,10 +67,6 @@ def __repr__(self):
     return f"Value(data={self.data}, grad={self.grad})"
 ```
 There are more magic methods in the value class but they follow the same principles that I have described above.
-
-## Graph viz for expressions
-- trace builds set of all nodes and edges
-- draw_dot displays these nodes and edges, adds nodes where ops are for clarity
 
 ## Backprop by hand through Andrej's Graph
 Karpathy uses a graphical visualisation of expressions (shown in the image below) to improve intuition around finding derivatives at each node with respect to the output. The expression used in his video is shown below, along with the graph that shows how nodes are combined with operations towards the output.
@@ -150,8 +146,11 @@ This is the sigmoid function. It is similar to tanh, except it is bounded betwee
 <img src="/assets/images/sigmoid.png" style="display: block; margin-left: auto; margin-right: auto; width: 40%;"/> 
 
 ### Tanh
-Tanh(x) = (e^2x - 1)/(e^2x + 1). Currently, the value object can only handle addition, multiplication and subtraction. If we were to break down the tanh function into individual operations and backpropagate through it that way, we would have to implement exponentiation and division methods within the class. To avoid doing this, we can use the math.tanh function built into Python. 
-The local derivative of tanh(x) is 1-tanh(x)^2 so we can implement the backward function in the value class like this:
+$$
+\tanh(x) = (e^2x - 1)/(e^2x + 1) 
+$$
+Currently, the value object can only handle addition, multiplication and subtraction. If we were to break down the tanh function into individual operations and backpropagate through it that way, we would have to implement exponentiation and division methods within the class. To avoid doing this, we can use the math.tanh function built into Python. 
+The local derivative of $\tanh(x)$ is $1-\tanh(x)^2$ so we can implement the backward function in the value class like this:
 ```python
 def _backward():
       self.grad += (1 - t**2) * out.grad
@@ -164,27 +163,30 @@ def _backward():
 
 We now have enough knowledge to backpropagate through an actual neuron within a neural network. Look back at the image of the neuron to remind yourself of the expression that we will be going back through. Before we begin, it should be noted that we don't need to work out the gradients at the inputs (x1, x2, ...) as these are not parameters of the network. We can only change the weights to effect the output of the network so we need to find the derivative of the weights with respect to the output of the neuron.
 
-When backpropagating, we start with the last part of the expression graph, and in the case of a neuron, that is the tanh: O = tanh(n) where O is the output and n is the input to the tanh from the previous part of the expression graph. dO/dN = 1 - O.data^2 
+When backpropagating, we start with the last part of the expression graph, and in the case of a neuron, that is the tanh: O = tanh(n) where O is the output and n is the input to the tanh from the previous part of the expression graph.
 
 $$
-\frac{\mathrm{d}o}{\mathrm{d}n} = 1 - O.data^2
+\frac{\mathrm{d}O}{\mathrm{d}n} = 1 - O.data^2
 $$
 
 Next is the plus node which distributes the gradient of the result of the operation to the nodes previous to it, as we saw in our first expression example.
 
 $$
-\frac{\mathrm{d}O}{\mathrm{d}x2w2} = \frac{\mathrm{d}O}{\mathrm{d}x1w1} = 0.5
+\frac{\mathrm{d}O}{\mathrm{d}(x2w2)} = \frac{\mathrm{d}O}{\mathrm{d}(x1w1)} = 0.5
 $$
 
 Each of the inputs (in this case x1 and x2) are multiplied by weights (in this case w1 and w2) in the neuron. Using the chain rule, we can find the derivative of the weights with respect to the output:
 
 $$
 x2w2 = x2 * w2
-\frac{\mathrm{d}x2w2}{\mathrm{d}x2} = w2 (local derivative)
-\frac{\mathrm{d}O}{\mathrm{d}x2w2} = 0.5
-\frac{\mathrm{d}O}{\mathrm{d}x2} = \frac{\mathrm{d}O}{\mathrm{d}x2w2} * \frac{\mathrm{d}x2w2}{\mathrm{d}x2} = 0.5 * w2
+
+\frac{\mathrm{d}(x2w2)}{\mathrm{d}x2} = w2 \;(local derivative)
+
+\frac{\mathrm{d}O}{\mathrm{d}(x2w2)} = 0.5
+
+\frac{\mathrm{d}O}{\mathrm{d}x2} = \frac{\mathrm{d}O}{\mathrm{d}x2w2} \times \frac{\mathrm{d}x2w2}{\mathrm{d}x2} = 0.5 \times w2
 $$
-And this is the derivative of w2 with respect to the output of the neuron! Repeat for the other weights and we now know how changing any of the weights will change the output of the neuron.
+This is the derivative of w2 with respect to the output of the neuron! Repeat for the other weights and we now know how changing any of the weights will change the output of the neuron.
 
 If this was challenging, I recommend going back through the first expression graph and recalculating the derivatives, and to look at the intuitive explanation on the Wikipedia page for the [chain rule][ChainRuleArticle]
 
@@ -205,10 +207,15 @@ The backward function for mul is a slightly more involved than for the add metho
 
 $$
 other = A
+
 self = B
+
 out = O
-O = A * B
-\frac{\mathrm{d}O}{\mathrm{d}A} = B (local gradient for A)
+
+O = A \times B
+
+\frac{\mathrm{d}O}{\mathrm{d}A} = B \;(local gradient for A)
+
 A.grad = B.val * out.grad
 $$
 (I found it easier to think about using A, B and O as variable names)
@@ -218,9 +225,9 @@ $$
 We have out.grad and we need to chain it into self.grad - this time we don't have an other.grad as tanh only takes one input.
 
 $$
-out = tanh(self.val)
+out = \tanh(self.val)
 
-\frac{\mathrm{d}out}{\mathrm{d}self} = 1 - tanh(self.val)^2 (local gradient)
+\frac{\mathrm{d}out}{\mathrm{d}self} = 1 - tanh(self.val)^2 \;(local gradient)
 
 self.grad = 1 - tanh(self.val)^2 * out.grad
 $$
