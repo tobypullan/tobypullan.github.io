@@ -9,39 +9,49 @@ usemathjax: true
     src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
 </script>
 ## Introduction
-This post begins by providing a definition for the value class, along with an explanation of the different attributes and methods that it contains. I then provide explanations for the differential with respect to L for each variable in a larger expression which will help to build an intuitive understanding for backpropagation within an actual neural network. Finally, we will implement a backward method for the value class, that when called on a value within an expression, will calculate the gradient of each value before with respect to the value that it is called on.
+This post begins by providing a definition for the value class, along with an explanation of the different attributes and methods that 
+it contains. I then provide explanations for the differential with respect to the loss for each variable in a larger expression which will 
+help to build an intuitive understanding for backpropagation within an actual neural network. Finally, we will implement a backward 
+method for the value class, that when called on a value within an expression, will calculate the gradient of each previous value in the expression graph with 
+respect to the value that it is called on (a backpropagation method).
 
 ## Value Class
 <img src="/assets/images/valueClassDiagram.png" style="display: block; margin-left: auto; margin-right: auto; width: 40%;"/>
-The value class contains methods and attributes that allow you to create expressions. These expressions can be backpropagated through using the backward method. This allows the value of the object to be altered to be changed in a way that has a predictable effect on the overall output of the expression.
+The value class contains methods and attributes that allow you to create expressions. The backward method within the 
+value class automatically backpropagates through expressions that are made using value objects. 
+This allows the value of the object to be altered to be changed in a way that has a predictable effect on 
+the overall output of the expression.
 
 ### \__init__
 What is going on when the value class is initialised?
 ```python
 def __init__(self, data, _children=(), _op='', label=''):
-	self.data = data
+self.data = data
     self.grad = 0.0
     self._backward = lambda: None
     self._prev = set(_children)
     self._op = _op
     self.label = label
 ```
-Clearly, self.data is set to data and self.label is set to label (both parameters passed in when the object is initialised). "label" is what is displayed for the value object when it is within the graphical representation of the expression. self.grad is initialised at zero as this means that changing the value of the object will have no effect on the output of the expression, which initially is the behaviour that we want. self._backward is defined as a function that by default returns None. We will revisit _backward and backward later in this article. self._prev contains the nodes that were used to generate the current node, and self._op stores the operation that was used on those previous nodes to generate the current node.
+Clearly, self.data is set to data and self.label is set to label (both parameters passed in when the object is initialised). "label" is what is displayed for the value object when it is within the graphical representation of the expression. self.grad is initialised to zero as this means that changing the value of the object will have no effect on the output of the expression, which initially is the behaviour that we want. self._backward is defined as a function that by default returns None. We will revisit _backward and backward later in this article. self._prev contains the nodes that were used to generate the current node, and self._op stores the operation that was used on those previous nodes to generate the current node.
 
 ### \__add__ (and \__mul__ and \__repr__)
-All of these methods are called magic methods. Python contains a lot of magic methods (including \__init__ which you saw above) but we will focus on only these three in this section. [This article][MagicMethodsArticle] by Rafe Kettler on magic methods explains them very well. I used it when writing this section of the article to improve my explanations.
+All of these methods are called magic methods. Python contains a lot of magic methods (including \__init__ which we saw above) but we will focus on only these three in this section. [This article][MagicMethodsArticle] by Rafe Kettler on magic methods explains them very well. I used it when writing this section of the article to improve my explanations.
 
 When two value objects are summed together, Python needs to know how to handle this. This is done using the \__add__ magic method - it defines behaviour under the + operator.
 
 ```python
 # add method within value class
 def __add__(self, other):
-		# checks if other is a constant or a value, if a constant that makes into a value object
+# checks if other is a constant or a value, 
+# if a constant that makes into a value object
         other = other if isinstance(other, Value) else Value(other)
-		# the output of the "+": the data of each value object are summed together.
+# the output of the "+": the data of each 
+# value object are summed together.
         out = Value(self.data + other.data, (self, other), '+')
 		
-# ignore this for now: (used for calculating the gradient automatically during backpropagation)
+# ignore this for now: (used for calculating 
+# the gradient automatically during backpropagation)
 # ------------------------------
         def _backward():
             self.grad += out.grad
@@ -61,7 +71,8 @@ c = a.__add__(b)
 ```
 When two value objects are multiplied a similar process happens compared to when two value objects are summed together. The only difference is now the output is the data of the objects multiplied together instead of added, and the backward function looks a bit different.
 
-\__repr__ defines the behavior of the value class when it is output in the notebook. \__repr__ outputs the value of the object and the gradient with respect to the output as a string, rather than a memory location (which is much less helpful).
+\__repr__ defines the behavior of the value class when it is output in the notebook. \__repr__ outputs the 
+data and grad attributes of the value object as a string, rather than a memory location (which is much less helpful).
 ```python
 def __repr__(self):
     return f"Value(data={self.data}, grad={self.grad})"
@@ -78,55 +89,26 @@ L = d * f
 <img src="/assets/images/expressionGraph.png" style="padding-right:10px"/> 
 
 ### dL/dL
-The first node to find the derivative of is L. We are trying to find how all the nodes effect L, so we are finding dL/dL. This is like saying how much does L change if I change L by h (think back to differentiation by first principles)? Funnily enough, L changes by h if you change L by h.
+The first node to find the derivative of is L. We are trying to find how all the nodes affect L, so we are finding dL/dL. This is like saying how much does L change if I change L by h (think back to differentiation by first principles)? Funnily enough, L changes by h if you change L by h.
 
-So, the rate of change of L with respect to L is constant, dL/dL = 1.
+So, the rate of change of L with respect to L is constant for any value of L, dL/dL = 1.
 
-If you're not convinced, take an expression, say y=x^2. Now, plot x against x. You can see that it is a straight line with gradient 1, hence the derivative of x with respect to itself is 1. This graph is shown below:
-<table>
-<tr>
-    <th>x</th>
-    <th>y</th>
-</tr>
-<tr>
-    <td>1</td>
-    <td>1</td>
-</tr>
-<tr>
-    <td>2</td>
-    <td>4</td>
-</tr>
-<tr>
-    <td>3</td>
-    <td>9</td>
-</tr>
-<tr>
-    <td>4</td>
-    <td>16</td>
-</tr>
-<tr>
-    <td>5</td>
-    <td>25</td>
-</tr>
-</table>
 
-<img src="/assets/images/xAgainstX.png" style="padding-right:10px"/> 
-
-### dL/dD and dL/dF
-Next we need to find the derivative of D with respect to L. This is like saying "How does L change when we bump D by h". Looking back at our expression, we can see that L = D * F so dL/dD is F. Similarly, dL/dF = D. So, F.grad = D.data and D.grad = F.data. Neat!
+### dL/dd and dL/df
+Next we need to find the derivative of L with respect to d. This is like saying "How does L change when we bump d by h". Looking back at our expression, we can see that L = d * f so dL/dd is f. Similarly, dL/df = d. So, f.grad = d.data and d.grad = f.data. Neat!
 
 ### MOST IMPORTANT NODE TO UNDERSTAND (Using the chain rule)
-This is where things start to get a bit more interesting. We now want to find the derivative of C with respect to L: dL/dC. We know D = C + E and L = D * F so we know how D will change if we change C by a bit and we know how L will change if we change D. 
+This is where things start to get a bit more interesting. We now want to find the derivative of L with respect to c: dL/dc. We know d = c + e and L = d * f so we know how d will change if we change c by a bit and we know how L will change if we change d. 
 This is the intuition behind the chain rule. The Wikipedia article on the [chain rule][ChainRuleArticle] has a nice explanation on this: "If a car travels twice as fast as a bicycle and the bicycle is four times as fast as a walking man, then the car travels 2 * 4 = 8 times as fast as the man."
-So lets begin by working out the impact of C on D, which is another way of saying what is dD/dC. dD.dC = 1.
-Next we need to work out the impact of D on L - dL/dD = F. Using the chain rule, we know that dL/dC = dD/dC * dL/dD = 1 * F = F
+So lets begin by working out the impact of c on d. dd/dc = 1.
+Next we need to work out the impact of d on L: dL/dd = f. Using the chain rule, we know that dL/dc = dd/dc * dL/dd = 1 * f = f
 Similarly, dL/dE = dD/dE * dL/dD = 1 * F = dL/dD.
 Looking back at the expression in graph form, we see that the two nodes combined under the + operation now have the same gradient:
 <img src="/assets/images/expressionPlusDemo.png">
 
 
-### Applying the chaian rule again
-The next gradients we want to find is A and B, both with respect to L: dL/dA and dL/dB. The "local" expression is e = a * b. As we saw at the plus node, if we know how A affects E, and how E affects D etc, we can work out how A affects L. We have already worked out how E affects L so to find how a affects L, we need to find dE/dA and multiply that by dL/dE. We can call dE/dA the local gradient so to find the gradient at a node with respect to the output of the expression, we do the local gradient * the gradient of the output of the local expression with respect to the output. So dL/dA = dE/dA * dL/dE and dL/dB = dE/dB * dL/dE. dL/dA =  B * F, dL/dB = A * F.
+### Applying the chain rule again
+The next derivates we want to find are L with respect to a and with respect to b: dL/da and dL/db. The "local" expression is e = a * b. As we saw at the plus node, if we know how a affects e, and how e affects d etc, we can work out how a affects L. We have already worked out how e affects L so to find how a affects L, we need to find de/da and multiply that by dL/de. We can call de/da the local gradient. To find the "global" gradient of the expression, we do (the local gradient) * (the gradient of the output of the local expression). So dL/da = de/da * dL/de and dL/db = de/db * dL/de. dL/da =  b * f, dL/db = a * f.
 
 ## What have we learnt from doing this?
 Iterated through all the nodes and locally applied the chain rule. We know what the local derivatives at each operation are. Using the chain rule, we can find how each node affects the output and this is backpropagation in action.
