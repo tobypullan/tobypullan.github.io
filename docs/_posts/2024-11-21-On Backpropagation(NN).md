@@ -9,12 +9,8 @@ usemathjax: true
     src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
 </script>
 ## Introduction
-This post begins by providing a definition for the `value` class, along with an explanation of the different attributes and methods that 
-it contains. I then provide explanations for finding the  for each variable in a larger expression which will 
-help to build an intuitive understanding for backpropagation within an actual neural network. Finally, we will implement a backward 
-method for the value class, that when called on a value within an expression, will calculate the gradient of each previous value in the expression graph with 
-respect to the value that it is called on (a backpropagation method).
-
+This post begins by providing a definition for the `value` class, which stores the data and methods associated with each node of the network. I then provide explanations for finding the derivatives of the network output with respect to the nodes. Finally, we will use this knowledge to implement a `backward` method for the `value` class, to implement backpropagation.
+ 
 ## Value Class
 <img src="/assets/images/valueClassDiagram.png" style="display: block; margin-left: auto; margin-right: auto; width: 40%;"/>
 The value class contains methods and attributes that allow you to create expressions. The backward method within the 
