@@ -9,8 +9,8 @@ usemathjax: true
     src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
 </script>
 ## Introduction
-This post begins by providing a definition for the value class, along with an explanation of the different attributes and methods that 
-it contains. I then provide explanations for the differential with respect to the loss for each variable in a larger expression which will 
+This post begins by providing a definition for the `value` class, along with an explanation of the different attributes and methods that 
+it contains. I then provide explanations for finding the  for each variable in a larger expression which will 
 help to build an intuitive understanding for backpropagation within an actual neural network. Finally, we will implement a backward 
 method for the value class, that when called on a value within an expression, will calculate the gradient of each previous value in the expression graph with 
 respect to the value that it is called on (a backpropagation method).
@@ -26,7 +26,7 @@ the overall output of the expression.
 What is going on when the value class is initialised?
 ```python
 def __init__(self, data, _children=(), _op='', label=''):
-self.data = data
+    self.data = data
     self.grad = 0.0
     self._backward = lambda: None
     self._prev = set(_children)
