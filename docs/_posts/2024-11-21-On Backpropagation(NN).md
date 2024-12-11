@@ -10,16 +10,17 @@ usemathjax: true
 </script>
 ## Introduction
 This post begins by providing a definition for the `value` class, which stores the data and methods associated with each node of the network. I then provide explanations for finding the derivatives of the network output with respect to the nodes. Finally, we will use this knowledge to implement a `backward` method for the `value` class, to implement backpropagation.
- 
+
 ## Value Class
 <img src="/assets/images/valueClassDiagram.png" style="display: block; margin-left: auto; margin-right: auto; width: 40%;"/>
-The value class contains methods and attributes that allow you to create expressions. The backward method within the 
-value class automatically backpropagates through expressions that are made using value objects. 
-This allows the value of the object to be altered to be changed in a way that has a predictable effect on 
+
+The `value` class contains methods and attributes that allow you to create expressions. The `backward` method within the 
+`value` class automatically backpropagates through expressions that are made using `value` objects. 
+This allows the `data` attribute of the `value` object to be changed in a way that has a predictable effect on 
 the overall output of the expression.
 
 ### \__init__
-What is going on when the value class is initialised?
+What is going on when the `value` class is initialised?
 ```python
 def __init__(self, data, _children=(), _op='', label=''):
     self.data = data
@@ -29,7 +30,7 @@ def __init__(self, data, _children=(), _op='', label=''):
     self._op = _op
     self.label = label
 ```
-Clearly, self.data is set to data and self.label is set to label (both parameters passed in when the object is initialised). "label" is what is displayed for the value object when it is within the graphical representation of the expression. self.grad is initialised to zero as this means that changing the value of the object will have no effect on the output of the expression, which initially is the behaviour that we want. self._backward is defined as a function that by default returns None. We will revisit _backward and backward later in this article. self._prev contains the nodes that were used to generate the current node, and self._op stores the operation that was used on those previous nodes to generate the current node.
+`self.data` is set to `data` and `self.label` is set to `label` (both parameters passed in when the object is initialised). `label` is what is displayed for the `value` object when it is within the graphical representation of the expression. `self.grad` is initialised to zero as this means that changing the `data` of the object will have no effect on the output of the expression, which initially is the behaviour that we want. `self._backward` is defined as a function that by default returns `None`. We will revisit `_backward` and `backward` later in this article. `self._prev` contains the references to `value` objects that were used to generate the current node, and `self._op` stores the operation that was used on those previous nodes to generate the current node.
 
 ### \__add__ (and \__mul__ and \__repr__)
 All of these methods are called magic methods. Python contains a lot of magic methods (including \__init__ which we saw above) but we will focus on only these three in this section. [This article][MagicMethodsArticle] by Rafe Kettler on magic methods explains them very well. I used it when writing this section of the article to improve my explanations.
