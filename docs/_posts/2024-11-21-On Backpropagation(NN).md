@@ -33,9 +33,9 @@ def __init__(self, data, _children=(), _op='', label=''):
 `self.data` is set to `data` and `self.label` is set to `label` (both parameters passed in when the object is initialised). `label` is what is displayed for the `value` object when it is within the graphical representation of the expression. `self.grad` is initialised to zero as this means that changing the `data` of the object will have no effect on the output of the expression, which initially is the behaviour that we want. `self._backward` is defined as a function that by default returns `None`. We will revisit `_backward` and `backward` later in this article. `self._prev` contains the references to `value` objects that were used to generate the current node, and `self._op` stores the operation that was used on those previous nodes to generate the current node.
 
 ### \__add__ (and \__mul__ and \__repr__)
-All of these methods are called magic methods. Python contains a lot of magic methods (including \__init__ which we saw above) but we will focus on only these three in this section. [This article][MagicMethodsArticle] by Rafe Kettler on magic methods explains them very well. I used it when writing this section of the article to improve my explanations.
+All of these methods are called magic methods. Python contains a lot of magic methods (including `\__init__` which we saw above) but we will focus on only these three in this section. [This article][MagicMethodsArticle] by Rafe Kettler on magic methods explains them very well. I used it when writing this section of the article to improve my explanations.
 
-When two value objects are summed together, Python needs to know how to handle this. This is done using the \__add__ magic method - it defines behaviour under the + operator.
+When two `value` objects are summed together, Python needs to know how to handle this. This is done using the `\__add__` magic method - it defines behaviour under the `+` operator.
 
 ```python
 # add method within value class
@@ -66,18 +66,23 @@ c = a + b
 # is equivalent to writing this
 c = a.__add__(b)
 ```
-When two value objects are multiplied a similar process happens compared to when two value objects are summed together. The only difference is now the output is the data of the objects multiplied together instead of added, and the backward function looks a bit different.
+When two `value` objects are multiplied a similar process happens compared to when two `value` objects are summed together. The only difference is now the output is the data of the objects multiplied together instead of added, and the `_backward` function looks a bit different.
 
-\__repr__ defines the behavior of the value class when it is output in the notebook. \__repr__ outputs the 
-data and grad attributes of the value object as a string, rather than a memory location (which is much less helpful).
+`\__repr__` defines the behavior of the `value` class when it is output in the notebook. `\__repr__` outputs the 
+`data` and `grad` attributes of the `value` object as a string, rather than a memory location.
 ```python
 def __repr__(self):
     return f"Value(data={self.data}, grad={self.grad})"
 ```
-There are more magic methods in the value class but they follow the same principles that I have described above.
+There are more magic methods in the `value` class but they follow the same principles that I have described above.
+
+## The data and grad attributes
+Before we go any further, there are two important attributes to that we need to understand - the `data` and `grad` attributes.
+- `data`: The current numerical value of this node in the expression.
+- `grad`: This is the derivative of the final output of the expression with respect to the current node.
 
 ## Backprop by hand through Andrej's Graph
-Karpathy uses a graphical visualisation of expressions (shown in the image below) to improve intuition around finding derivatives at each node with respect to the output. The expression used in his video is shown below, along with the graph that shows how nodes are combined with operations towards the output.
+Karpathy uses a graphical visualisation of expressions (shown in the image below) to improve intuition around finding derivatives at each node with respect to the output. The expression used in his video is shown below, along with the graph that shows how nodes are combined with operations. We will move through this expression from right to left filling in the `grad` attributes for each `value` object.
 ```python 
 e = a * b
 d = e + c
