@@ -33,9 +33,9 @@ def __init__(self, data, _children=(), _op='', label=''):
 `self.data` is set to `data` and `self.label` is set to `label` (both parameters passed in when the object is initialised). `label` is what is displayed for the `value` object when it is within the graphical representation of the expression. `self.grad` is initialised to zero as this means that changing the `data` of the object will have no effect on the output of the expression, which initially is the behaviour that we want. `self._backward` is defined as a function that by default returns `None`. We will revisit `_backward` and `backward` later in this article. `self._prev` contains the references to `value` objects that were used to generate the current node, and `self._op` stores the operation that was used on those previous nodes to generate the current node.
 
 ### \__add__ (and \__mul__ and \__repr__)
-All of these methods are called magic methods. Python contains a lot of magic methods (including `\__init__` which we saw above) but we will focus on only these three in this section. [This article][MagicMethodsArticle] by Rafe Kettler on magic methods explains them very well. I used it when writing this section of the article to improve my explanations.
+All of these methods are called magic methods. Python contains a lot of magic methods (including `__init__` which we saw above) but we will focus on only these three in this section. [This article][MagicMethodsArticle] by Rafe Kettler on magic methods explains them very well. I used it when writing this section of the article to improve my explanations.
 
-When two `value` objects are summed together, Python needs to know how to handle this. This is done using the `\__add__` magic method - it defines behaviour under the `+` operator.
+When two `value` objects are summed together, Python needs to know how to handle this. This is done using the `__add__` magic method - it defines behaviour under the `+` operator.
 
 ```python
 # add method within value class
@@ -82,7 +82,9 @@ Before we go any further, there are two important attributes to that we need to 
 - `grad`: This is the derivative of the final output of the expression with respect to the current node.
 
 ## Backprop by hand through Andrej's Graph
-Karpathy uses a graphical visualisation of expressions (shown in the image below) to improve intuition around finding derivatives at each node with respect to the output. The expression used in his video is shown below, along with the graph that shows how nodes are combined with operations. We will move through this expression from right to left filling in the `grad` attributes for each `value` object.
+Karpathy uses a graphical visualisation of expressions (shown in the image below) to improve intuition around finding derivatives at each node. The expression used in his video is shown below, along with the graph that shows how nodes are combined with operations. We will move through this expression from right to left filling in the `grad` attributes for each `value` object.
+
+In all cases, we are finding the derivative of the output of the expression (L) with respect to the node that we are currently focusing on. This is so that we know how changing the `data` of the node will affect the output of the expression.
 ```python 
 e = a * b
 d = e + c
@@ -91,29 +93,26 @@ L = d * f
 <img src="/assets/images/expressionGraph.png" style="padding-right:10px"/> 
 
 ### dL/dL
-The first node to find the derivative of is L. We are trying to find how all the nodes affect L, so we are finding dL/dL. This is like saying how much does L change if I change L by h (think back to differentiation by first principles)? Funnily enough, L changes by h if you change L by h.
+The first node that we will find the derivative of is L with respect to L (how much does L change if I change L by h - think back to differentiation by first principles). L changes by h if you change L by h.
 
 So, the rate of change of L with respect to L is constant for any value of L, dL/dL = 1.
 
-
 ### dL/dd and dL/df
-Next we need to find the derivative of L with respect to d. This is like saying "How does L change when we bump d by h". Looking back at our expression, we can see that L = d * f so dL/dd is f. Similarly, dL/df = d. So, f.grad = d.data and d.grad = f.data. Neat!
+Next we need to find the derivative of L with respect to d. This is like saying "How does L change when we bump d by h". Looking back at our expression, we can see that L = d * f so dL/dd is f. Similarly, dL/df = d. So, `f.grad` = `d.data` and `d.grad` = `f.data`. Neat!
 
-### MOST IMPORTANT NODE TO UNDERSTAND (Using the chain rule)
+### THE MOST IMPORTANT NODE TO UNDERSTAND (Using the chain rule)
 This is where things start to get a bit more interesting. We now want to find the derivative of L with respect to c: dL/dc. We know d = c + e and L = d * f so we know how d will change if we change c by a bit and we know how L will change if we change d. 
 This is the intuition behind the chain rule. The Wikipedia article on the [chain rule][ChainRuleArticle] has a nice explanation on this: "If a car travels twice as fast as a bicycle and the bicycle is four times as fast as a walking man, then the car travels 2 * 4 = 8 times as fast as the man."
 So lets begin by working out the impact of c on d. dd/dc = 1.
 Next we need to work out the impact of d on L: dL/dd = f. Using the chain rule, we know that dL/dc = dd/dc * dL/dd = 1 * f = f
 Similarly, dL/dE = dD/dE * dL/dD = 1 * F = dL/dD.
-Looking back at the expression in graph form, we see that the two nodes combined under the + operation now have the same gradient:
+Looking back at the expression in graph form, we see that the two nodes combined under the + operation now have the same `grad`:
 <img src="/assets/images/expressionPlusDemo.png">
 
 
 ### Applying the chain rule again
 The next derivates we want to find are L with respect to a and with respect to b: dL/da and dL/db. The "local" expression is e = a * b. As we saw at the plus node, if we know how a affects e, and how e affects d etc, we can work out how a affects L. We have already worked out how e affects L so to find how a affects L, we need to find de/da and multiply that by dL/de. We can call de/da the local gradient. To find the "global" gradient of the expression, we do (the local gradient) * (the gradient of the output of the local expression). So dL/da = de/da * dL/de and dL/db = de/db * dL/de. dL/da =  b * f, dL/db = a * f.
 
-## What have we learnt from doing this?
-Iterated through all the nodes and locally applied the chain rule. We know what the local derivatives at each operation are. Using the chain rule, we can find how each node affects the output and this is backpropagation in action.
 
 ## Optimisation
 Now that we have the gradient at each node, we know how changing the value of the node to be more positive or more negative will effect the overall output of the expression (if the gradient is positive, increasing the value will increase the output of the expression). The output of a neural network comes from a loss function. This function takes the output of the neural network and compares it with the actual output that it should have produced. The goal is to minimise the loss function to make the outputs of the network as close to the actual output it should have produced as possible. Using the gradients at each node, the "weights" in the neural network can be changed so that the loss function is minimised. This is how neural networks are optimised.
@@ -122,7 +121,7 @@ Now that we have the gradient at each node, we know how changing the value of th
 <img src="/assets/images/neurons.png" style="padding-right:10px"/>
 Image from ["towards data science neurons in perceptrons"][towardsDSNeurons]
 
-A neural network is made up of neurons. A neuron is an abstraction for a function. The function takes in some inputs. Each input is multiplied by a different weight stored in the neuron. The outputs of these multiplications are then summed together with a bias. The output of this sum is then put through an activiation function like tanh or sigmoid which squashes its value between 1 and -1 (different activation functions can be used, but we will be using tanh). You can see this in the image above.
+A neural network is made up of neurons. A neuron is an abstraction for a function. The function takes in some inputs. Each input is multiplied by a different weight stored in the neuron. The outputs of these multiplications are then summed together with a bias. The output of this sum is then put through an activiation function like tanh or sigmoid which squashes its value between 1 and -1 (different activation functions can be used, but we will be using tanh).
 
 This is the tanh function. Notice how the higher the magnitude the input to the function is, the closer to one the output is. However, there are diminishing returns - closer to zero an increase in the input will increase the output more than if you are further from zero and increase the input.
 <img src="/assets/images/tanh.png" style="padding-right:10px"/>
@@ -130,11 +129,11 @@ This is the sigmoid function. It is similar to tanh, except it is bounded betwee
 <img src="/assets/images/sigmoid.png" style="display: block; margin-left: auto; margin-right: auto; width: 40%;"/> 
 
 ### Tanh
-$$
-\tanh(x) = (e^2x - 1)/(e^2x + 1) 
-$$
-Currently, the value object can only handle addition, multiplication and subtraction. If we were to break down the tanh function into individual operations and backpropagate through it that way, we would have to implement exponentiation and division methods within the class. To avoid doing this, we can use the math.tanh function built into Python. 
-The local derivative of $\tanh(x)$ is $1-\tanh(x)^2$ so we can implement the backward function in the value class like this:
+
+tanh(x) = (e^2x - 1)/(e^2x + 1) 
+
+Currently, the `value` object can only handle addition, multiplication and subtraction. If we were to break down the mathematical tanh function into individual operations and backpropagate through it that way, we would have to implement exponentiation and division methods within the class. To avoid doing this, we can use the `math.tanh` function built into Python. 
+The local derivative of tanh(x) is 1-tanh(x)^2 so we can implement the `_backward` function in the value class like this:
 ```python
 def _backward():
       self.grad += (1 - t**2) * out.grad
@@ -145,82 +144,69 @@ def _backward():
 
 <img src="/assets/images/neuronExpressionGraph.png">
 
-We now have enough knowledge to backpropagate through an actual neuron within a neural network. Look back at the image of the neuron to remind yourself of the expression that we will be going back through. Before we begin, it should be noted that we don't need to work out the gradients at the inputs (x1, x2, ...) as these are not parameters of the network. We can only change the weights to effect the output of the network so we need to find the derivative of the weights with respect to the output of the neuron.
+We now have enough knowledge to backpropagate through an actual neuron within a neural network. Look back at the image of the neuron to remind yourself of the expression. Before we begin, it should be noted that we don't need to work out the gradients at the inputs (x1, x2, ...) as these are not parameters of the network. We can only change the weights to effect the output of the network so we need to find the derivative of the weights with respect to the output of the neuron.
 
-When backpropagating, we start with the last part of the expression graph, and in the case of a neuron, that is the tanh: O = tanh(n) where O is the output and n is the input to the tanh from the previous part of the expression graph.
+When backpropagating, we start with the last part of the expression graph, and in the case of a neuron, that is the tanh: o = tanh(n) where o is the output and n is the input to the tanh from the previous part of the expression graph: do/dn = 1 - o^2
 
-$$
-\frac{\mathrm{d}O}{\mathrm{d}n} = 1 - O.data^2
-$$
-
-Next is the plus node which distributes the gradient of the result of the operation to the nodes previous to it, as we saw in our first expression example.
-
-$$
-\frac{\mathrm{d}O}{\mathrm{d}(x2w2)} = \frac{\mathrm{d}O}{\mathrm{d}(x1w1)} = 0.5
-$$
+Next is the plus node which distributes the gradient of the result of the operation to the nodes previous to it, as we saw in our first expression example: do/d(x2w2) = do/d(x1w1) = 0.5
 
 Each of the inputs (in this case x1 and x2) are multiplied by weights (in this case w1 and w2) in the neuron. Using the chain rule, we can find the derivative of the weights with respect to the output:
 
-$$
 x2w2 = x2 * w2
 
-\frac{\mathrm{d}(x2w2)}{\mathrm{d}x2} = w2 \;(local derivative)
+d(x2w2)/d(w2) = x2 (local derivative)
 
-\frac{\mathrm{d}O}{\mathrm{d}(x2w2)} = 0.5
+do/d(x2w2) = 0.5
 
-\frac{\mathrm{d}O}{\mathrm{d}x2} = \frac{\mathrm{d}O}{\mathrm{d}x2w2} \times \frac{\mathrm{d}x2w2}{\mathrm{d}x2} = 0.5 \times w2
-$$
-This is the derivative of w2 with respect to the output of the neuron! Repeat for the other weights and we now know how changing any of the weights will change the output of the neuron.
+do/d(w2) = do/d(x2w2) * d(x2w2)/d(w2) = 0.5 * x2
+
+This is the derivative of the output of the neuron with respect to w2! Repeat for the other weights and we now know how changing any of the weights will change the output of the neuron.
 
 If this was challenging, I recommend going back through the first expression graph and recalculating the derivatives, and to look at the intuitive explanation on the Wikipedia page for the [chain rule][ChainRuleArticle]
 
 ## Implementing the backward pass automatically!
-In this section of this post, we will be adding functions to the operation methods within the value class. Eventually, this will allow .backward to be called on any node in the expression and the derivative of all previous nodes with respect to that node will be calculated.
+In this section of this post, we will be adding functions to the operation methods within the value class. Eventually, this will allow `.backward` to be called on any node in the expression and the derivative of all previous nodes with respect to that node will be calculated.
 
 ### Add
-The add method takes two value objects - self and other. The backward method should set self.grad and other.grad. We know that the plus node distributes the gradient of the output of the node to its previous nodes, so:
+The add method takes two value objects - `self` and `other`. The backward method should set `self.grad` and `other.grad`. We know that the plus node distributes the gradient of the output of the node to its previous nodes, so:
 
-$$
+```python
 self.grad = out.grad
 other.grad = out.grad
-$$
-
+```
 
 ### Mul
 The backward function for mul is a slightly more involved than for the add method. We need to find the local gradient and multiply it by the gradient of the output:
 
-$$
-other = A
+let `other` = A
 
-self = B
+`self` = B
 
-out = O
+`out` = O
 
-O = A \times B
+O = A * B
 
-\frac{\mathrm{d}O}{\mathrm{d}A} = B \;(local gradient for A)
+dO/dA = B (local gradient for A)
 
-A.grad = B.val * out.grad
-$$
+so `other.grad` = `self.data` * `out.grad`
+
 (I found it easier to think about using A, B and O as variable names)
 
 
 ### Tanh
-We have out.grad and we need to chain it into self.grad - this time we don't have an other.grad as tanh only takes one input.
+We have `out.grad` and we need to chain it into `self.grad` - this time we don't have an `other.grad` as tanh only takes one input.
 
-$$
-out = \tanh(self.val)
+`out` = tanh(`self.data`)
 
-\frac{\mathrm{d}out}{\mathrm{d}self} = 1 - tanh(self.val)^2 \;(local gradient)
+d(out)/d(self) = 1 - tanh(`self.data`)^2 (local gradient)
 
-self.grad = 1 - tanh(self.val)^2 * out.grad
-$$
+`self.grad` = 1 - tanh(`self.val`)^2 * `out.grad`
 
 ### Doing the pass
-Now that we have implemented backward function for all the operation methods, we can implement a backward method for the value class. First we need to set self.grad to 1 as we know dx/dx = 1.
+Now that we have implemented `_backward` function for all the operation methods, we can implement a `backward` method for the value class. First we need to set `self.grad` to 1 as we know dx/dx = 1.
 
-We can only call .backward on a node, until all the nodes after it have had .backward called on them. This means we need to sort the nodes in the expression graph to ensure that we don't call the backward function on a node who's output does not have a .grad.
-This can be achieved using a [topological sort][topoSort]. This ensures that "for every directed edge (u,v) from vertex u to vertex v, u comes before v in the ordering" (if .backawrd is called on nodes in this order then there is not a case where .backward will be called on a node who's output has no .grad).
+We can only call `.backward` on a node, until all the nodes after it have had `.backward` called on them. This means we need to sort the nodes in the expression graph to ensure that we don't call the backward function on a node who's output does not have a .grad.
+This can be achieved using a [topological sort][topoSort]. This ensures that "for every directed edge (u,v) from vertex u to vertex v, u comes before v in the ordering" (if `.backawrd` is called on nodes in this order then there is not a case where `.backward` will be called on a node who's output has no `.grad`).
 
 ```python
 # method of value class
