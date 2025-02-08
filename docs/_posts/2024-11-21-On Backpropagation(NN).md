@@ -68,7 +68,7 @@ c = a.__add__(b)
 ```
 When two `value` objects are multiplied a similar process happens compared to when two `value` objects are summed together. The only difference is now the output is the data of the objects multiplied together instead of added, and the `_backward` function looks a bit different.
 
-`\__repr__` defines the behavior of the `value` class when it is output in the notebook. `\__repr__` outputs the 
+`__repr__` defines the behavior of the `value` class when it is output in the notebook. `__repr__` outputs the 
 `data` and `grad` attributes of the `value` object as a string, rather than a memory location.
 ```python
 def __repr__(self):
@@ -105,7 +105,7 @@ This is where things start to get a bit more interesting. We now want to find th
 This is the intuition behind the chain rule. The Wikipedia article on the [chain rule][ChainRuleArticle] has a nice explanation on this: "If a car travels twice as fast as a bicycle and the bicycle is four times as fast as a walking man, then the car travels 2 * 4 = 8 times as fast as the man."
 So lets begin by working out the impact of c on d. dd/dc = 1.
 Next we need to work out the impact of d on L: dL/dd = f. Using the chain rule, we know that dL/dc = dd/dc * dL/dd = 1 * f = f
-Similarly, dL/dE = dD/dE * dL/dD = 1 * F = dL/dD.
+Similarly, dL/de = dd/de * dL/dd = 1 * f = dL/dd.
 Looking back at the expression in graph form, we see that the two nodes combined under the + operation now have the same `grad`:
 <img src="/assets/images/expressionPlusDemo.png">
 
@@ -115,7 +115,16 @@ The next derivates we want to find are L with respect to a and with respect to b
 
 
 ## Optimisation
-Now that we have the gradient at each node, we know how changing the value of the node to be more positive or more negative will effect the overall output of the expression (if the gradient is positive, increasing the value will increase the output of the expression). The output of a neural network comes from a loss function. This function takes the output of the neural network and compares it with the actual output that it should have produced. The goal is to minimise the loss function to make the outputs of the network as close to the actual output it should have produced as possible. Using the gradients at each node, the "weights" in the neural network can be changed so that the loss function is minimised. This is how neural networks are optimised.
+Now that we have the gradient at each node, we know how changing the value of the node to be more positive or more negative will effect 
+the overall output of the expression (if the gradient is positive, increasing the value will increase the output of the expression). 
+
+
+When training neural networks, given an input we know what the output should be. When an input is put into the neural network (neural networks 
+are big expressions), the output is compared to what the output should be given the input. This 
+is quantified using a loss function. We will go into more detail about loss functions later. The goal is to minimise the value produced 
+by the loss function which can be done by changing the nodes in the expression - specifically, the weights. We know how to change the 
+weights as we know the gradients at each node. This is how we optimise neural networks.
+
 
 ## Backpropagation through a neuron
 <img src="/assets/images/neurons.png" style="padding-right:10px"/>
