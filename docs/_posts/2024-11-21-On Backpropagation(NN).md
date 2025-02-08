@@ -237,12 +237,17 @@ def backward(self):
 ```
 
 ### A bug!
-There is currently a bug in our implementation. If we have the expression b = a + a, we get a gradient of 1 not 2. This is because self.grad is set to 1 and other.grad is set to 1 but other and self are the same object in this case, so other.grad overrides self.grad. They should accumulate not override. This bug appears when we use a variable more than once in an expression.
-When we are backpropagating through the expression graph, we are actually doing partial derivatives *** CHECK ***
-- What if b = a + a and call b.backward
-- Get a gradient of 1 not 2
-- This is because self.grad was set to 1 and then other.grad was set to 1 - other overrides self, they should accumulate not override
-- We get the bug when using a variable more than once
+There is currently a bug in our implementation. If we have the expression `b = a + a`, we get a `b.grad` = 1 not 2. This is because 
+`self.grad` is set to 1 and `other.grad` is set to 1 but other and self are the same object in this case, so `other.grad` overrides 
+`self.grad`. They should accumulate not override, so in all our previous `_backward` method implementations, we should use `+=` not just 
+`=`
+
+```python
+#example: add _backward should be written like this:
+self.grad += out.grad
+other.grad += out.grad
+```
+
 
 ## Breaking down tanh (a fun exercise!)
 
