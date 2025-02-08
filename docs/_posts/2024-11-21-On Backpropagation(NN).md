@@ -240,10 +240,10 @@ def backward(self):
 There is currently a bug in our implementation. If we have the expression `b = a + a`, we get a `b.grad` = 1 not 2. This is because 
 `self.grad` is set to 1 and `other.grad` is set to 1 but other and self are the same object in this case, so `other.grad` overrides 
 `self.grad`. They should accumulate not override, so in all our previous `_backward` method implementations, we should use `+=` not just 
-`=`
+`=`. 
 
 ```python
-#example: add _backward should be written like this:
+#example: __add__ _backward should be written like this:
 self.grad += out.grad
 other.grad += out.grad
 ```
@@ -251,24 +251,27 @@ other.grad += out.grad
 
 ## Breaking down tanh (a fun exercise!)
 
-$$
-\tanh(x) = \frac{e^2x - 1}{e^2x + 1}
-$$
+tanh(x) = (e^2x - 1)/(e^2x + 1)
+
 
 ### Adding constant functionality
-In order to implement tanh with its individual components, we need to apply operations with constants to value objects. At the moment we can only apply operations to two value objects. When a value object is added to a constant, Python is trying to access constant.data
-but that does not exist. To fix this, we can check whether other isinstance of a value, and if it isn't, wrap the constant into a value object. This fix works, but only when the constant is applied to the value object, not when the value object is applied to the
-constant. To fix this, we can define radd, rmul, etc methods within the value class. These methods are so that if constant.\__add__(valueobject) is called, the interpreter knows how to handle the reversed order compared to the \__add__ method.
+In order to implement tanh with its individual components, we need to be able to apply operations between constants and `value` objects. At the moment we can only apply operations between two `value` objects. When a `value` object is added to a constant, let `c` = a constant, Python is trying to access `c.data`
+but that does not exist. To fix this, we can check whether `other` `isinstance` of a `value`, and if it isn't, wrap the constant into a `value` object. This fix works, but only when the constant is applied to the `value` object, not when the `value` object is applied to `c`. To fix this, we can define `__radd__`, `__rmul__`, etc methods within the `value` class. These methods are so that if `c.__add__(valueobject)` is called, the interpreter knows how to handle the reversed order compared to the `__add__` method.
 
 ### Exponentials
-Next we need to add exponentials to our value class. We can use math.exp(self.data) for the output of the object. The local derivative stays as e^x as d(e^x)/dx = e^x so self.grad = out.data * out.grad.
-
+Next we need to add exponentials to our `value` class. We can use `math.exp(self.data)` for the output of the object. The local derivative stays as e^x as d(e^x)/dx = e^x so
+```python
+self.grad = out.data * out.grad
+```
 ### Division
 Finally, division is just a special case of multiplication where the divisor (in the multiplication) has been raised to the power of -1. This means for our implementation of division, we will really just be implementing a power function. For the output we can use
-self.data**other (not other.data as we are only handling to the power of a constant not a value object). The local derivative is other * self.data ** (other - 1) so self.grad = other * self.data ** (other - 1) * out.grad.
+`self.data**other` (not `other.data` as we are only handling to the power of a constant not a `value` object).
+```python
+self.grad = other * self.data**(other - 1) * out.grad
+```
 
 ## Summary
-In this blog post, we have gone through Micrograd's implementation of the value class, with a focus on how the backward method works. We have used our knowledge of the chain rule to backpropagate by hand first through an example expression and through a neuron that would be used as part of a wider neural network.
+In this blog post, we have gone through Micrograd's implementation of the value class, with a focus on how the `backward` method works. We have used our knowledge of the chain rule to backpropagate by hand first through an example expression and through a neuron that would be used as part of a wider neural network.
 
 
 [MagicMethodsArticle]: https://rszalski.github.io/magicmethods/
