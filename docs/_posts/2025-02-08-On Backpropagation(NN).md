@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "On Backpropagation (Applications to Neural Networks)"
-date:   2024-11-21 15:41:26 +0000
+date:   2025-02-08 21:41:26 +0000
 categories: Andrej Karpathy | Neural Networks Zero To Hero
 usemathjax: true
 ---
