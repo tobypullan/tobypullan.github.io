@@ -135,7 +135,7 @@ A neural network is made up of neurons. A neuron is an abstraction for a functio
 This is the tanh function. Notice how the higher the magnitude the input to the function is, the closer to one the output is. However, there are diminishing returns - closer to zero an increase in the input will increase the output more than if you are further from zero and increase the input.
 <img src="/assets/images/tanh.png" style="padding-right:10px"/>
 This is the sigmoid function. It is similar to tanh, except it is bounded between 0 and 1 rather than between -1 and 1.
-<img src="/assets/images/sigmoid.png" style="display: block; margin-left: auto; margin-right: auto; width: 40%;"/> 
+<img src="/assets/images/sigmoid.png" style="padding-right:10px"/> 
 
 ### Tanh
 
@@ -144,6 +144,7 @@ tanh(x) = (e^2x - 1)/(e^2x + 1)
 Currently, the `value` object can only handle addition, multiplication and subtraction. If we were to break down the mathematical tanh function into individual operations and backpropagate through it that way, we would have to implement exponentiation and division methods within the class. To avoid doing this, we can use the `math.tanh` function built into Python. 
 The local derivative of tanh(x) is 1-tanh(x)^2 so we can implement the `_backward` function in the value class like this:
 ```python
+# t = tanh(self.data)
 def _backward():
       self.grad += (1 - t**2) * out.grad
     out._backward = _backward
@@ -153,7 +154,7 @@ def _backward():
 
 <img src="/assets/images/neuronExpressionGraph.png">
 
-We now have enough knowledge to backpropagate through an actual neuron within a neural network. Look back at the image of the neuron to remind yourself of the expression. Before we begin, it should be noted that we don't need to work out the gradients at the inputs (x1, x2, ...) as these are not parameters of the network. We can only change the weights to effect the output of the network so we need to find the derivative of the weights with respect to the output of the neuron.
+We now have enough knowledge to backpropagate through an actual neuron within a neural network. Look back at the image of the neuron to remind yourself of the expression. Before we begin, it should be noted that we don't need to work out the gradients at the inputs (x1, x2, ...) as these are not parameters of the network. We can only change the weights to affect the output of the network so we need to find the derivative of the weights with respect to the output of the neuron.
 
 When backpropagating, we start with the last part of the expression graph, and in the case of a neuron, that is the tanh: o = tanh(n) where o is the output and n is the input to the tanh from the previous part of the expression graph: do/dn = 1 - o^2
 
@@ -176,30 +177,24 @@ If this was challenging, I recommend going back through the first expression gra
 ## Implementing the backward pass automatically!
 In this section of this post, we will be adding functions to the operation methods within the value class. Eventually, this will allow `.backward` to be called on any node in the expression and the derivative of all previous nodes with respect to that node will be calculated.
 
-### Add
-The add method takes two value objects - `self` and `other`. The backward method should set `self.grad` and `other.grad`. We know that the plus node distributes the gradient of the output of the node to its previous nodes, so:
+### \__Add__
+The add method takes two value objects - `self` and `other`. The `_backward` method should set `self.grad` and `other.grad`. We know that the plus node distributes the gradient of the output of the node to its previous nodes, so:
 
 ```python
 self.grad = out.grad
 other.grad = out.grad
 ```
 
-### Mul
-The backward function for mul is a slightly more involved than for the add method. We need to find the local gradient and multiply it by the gradient of the output:
+### \__Mul__
+The `_backward` function for mul is a slightly more involved than for the add method. We need to find the local gradient and multiply it by the gradient of the output to get the gradient at the node with respect to the output of the expression:
 
-let `other` = A
-
-`self` = B
-
-`out` = O
-
-O = A * B
-
-dO/dA = B (local gradient for A)
-
-so `other.grad` = `self.data` * `out.grad`
-
-(I found it easier to think about using A, B and O as variable names)
+```python
+self.out = other.data * self.data
+# d(self.out)/d(other.data) = self.data
+# d(self.out)/d(self.data) = other.data
+self.grad = other.data * out.grad
+other.grad = self.data * out.grad
+```
 
 
 ### Tanh
