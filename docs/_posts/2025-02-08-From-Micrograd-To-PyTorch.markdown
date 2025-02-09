@@ -7,6 +7,21 @@ usemathjax: true
 ---
 ## Introduction
 
+In this post we will compare the PyTorch and Micrograd APIs, build a small neural network and train it using a small dataset.
+
+## A comparison to PyTorch
+
+## Creating a tiny dataset and writing the loss function
+
+## Collecting all the parameters of the neural net
+
+## Optimising the network manually
+
+## Summary of what we learned and how to go towards modern neural nets
+
+## How PyTorch implements tanh
+
+## Conclusion
 doing the same thing but in PyTorch: comparison
 01:43:55 building out a neural net library (multi-layer perceptron) in micrograd
 01:51:04 creating a tiny dataset, writing the loss function
