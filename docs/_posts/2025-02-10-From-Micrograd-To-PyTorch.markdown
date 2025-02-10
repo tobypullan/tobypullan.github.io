@@ -3,7 +3,6 @@ layout: post
 title:  "From Micrograd to PyTorch (and building a neural network) - IN PROGRESS"
 date:   2025-02-10 21:41:26 +0000
 categories: Andrej Karpathy | Neural Networks Zero To Hero
-usemathjax: true
 ---
 ## Introduction
 
