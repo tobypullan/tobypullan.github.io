@@ -1,7 +1,7 @@
 ---
 layout: post
-title:  "From Micrograd to PyTorch (and building a neural network)"
-date:   2025-02-08 21:41:26 +0000
+title:  "From Micrograd to PyTorch (and building a neural network) - IN PROGRESS"
+date:   2025-02-10 21:41:26 +0000
 categories: Andrej Karpathy | Neural Networks Zero To Hero
 usemathjax: true
 ---
@@ -10,8 +10,15 @@ usemathjax: true
 In this post we will compare the PyTorch and Micrograd APIs, build a small neural network and train it using a small dataset.
 
 ## A comparison to PyTorch
+The main difference between Micrograd and PyTorch is that PyTorch is based around tensors rather than scalars. Tensors are multidimensional arrays of scalars. This is necessary as it improves the speed of passes through a neural network (we will go into the passes later in this post). This is through making better use of memory bandwidth and computing outputs of neurons in parallel.
+
+## Building a neural net library in Micrograd
+Exercises: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/tobypullan/tobypullan.github.io/blob/main/Micrograd_p3s1.ipynb)
+Answers: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/tobypullan/tobypullan.github.io/blob/main/Micrograd_p3s1_ANS.ipynb)
+We will begin by building a neuron class. We will use a similar syntax to the PyTorch API. The constructor takes a parameter 'nin' which stands for number of inputs. 
 
 ## Creating a tiny dataset and writing the loss function
+
 
 ## Collecting all the parameters of the neural net
 
