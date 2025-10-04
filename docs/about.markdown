@@ -4,10 +4,9 @@ title: About
 permalink: /about/
 ---
 
-Welcome to my Blog. My name is Toby and I am a first year computer science student at Durham University. I am interested in articial intelligence - specifically neural networks. Because of this, I have started this blog where I will be posting some articles and exercises that I have written about Andrej Karpathy's ["Neural Networks: Zero to Hero"][zero2hero-series] series. 
+Hello! My name is Toby and I am a second year computer science student at Durham University. I am interested in machine learning which is what this blog will largely be focused on. So far I have written two posts focusing on backpropagation using Andrej Karpathy's ["Neural Networks: Zero to Hero"][zero2hero-series] series. Going forward I want to write some essays talking about the future of artificial intelligence and about some of my own projects.
 
-I really enjoyed watching and coding alongside these videos. Before going through these videos, I had very little knowledge of neural networks but I now feel that I have a much better grasp of what is going on behind some of the abstractions involved in a framework like Pytorch. I also enjoyed completing the exercises that Dr Karpathy produced for his videos (that are certainly better than mine) but I wanted to have a go at making my own exercises that could be used as well as all the resources that he has produced.
+<a href="/assets/TobyPullanCV.pdf" target="_blank">View my CV</a>
 
-I hope you find these articles and exercises interesting!
 
 [zero2hero-series]: https://www.youtube.com/playlist?list=PLAqhIrjkxbuWI23v9cThsA9GvCAUhRvKZ
